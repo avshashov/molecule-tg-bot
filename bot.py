@@ -3,7 +3,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from config_data.config import Config, load_config
-from handlers import user_handlers
+#from handlers import user_handlers
 from keyboards.set_menu import set_main_menu
 
 
@@ -31,7 +31,7 @@ async def main():
     await set_main_menu(bot)
 
     # Регистрация роутеров
-    dp.include_router(user_handlers.router)
+    #dp.include_router(user_handlers.router)
 
     # Запуск поллинга
     # Можно пропустить накопившиеся апдейты пока бот был не в сети
