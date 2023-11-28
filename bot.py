@@ -4,12 +4,19 @@ import logging
 from aiogram import Bot, Dispatcher
 from config_data.config import Config, load_config
 from handlers import menu_handlers, answer_to_buttons
-from keyboards.set_menu import set_main_menu
+
+from aiogram.types import BotCommand
+from lexicon.lexicon_ru import LEXICON_MENU
 
 
 # Логирование
 logger = logging.getLogger(__name__)
 
+# Функция настройки меню
+async def set_main_menu(bot: Bot):
+    main_menu_commands = [BotCommand(command=command, description=description) for command, description in LEXICON_MENU.items()]
+    await bot.set_my_commands(main_menu_commands)
+    
 async def main():
     # Настройка логирования
     logging.basicConfig(
