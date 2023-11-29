@@ -13,7 +13,7 @@ from FSM.fsm import FSM_SET_NAME
 
 router = Router()
 
-# Хэндлер на команду "/start" - будет
+# Хендлер на команду "/start" - будет
 # добавлять пользователя в базу данных, если его там еще не было
 # и отправлять ему приветственное сообщение
 @router.message(CommandStart())
@@ -33,3 +33,14 @@ async def start_command(message: Message, state: FSMContext):
         await message.answer(text=LEXICON_RU['unknown'])
         # устанавливаем машину состояний: ожидание ввода имени, пользователь указывает имя, заносим в базу
         await state.set_state(FSM_SET_NAME.fill_name)
+
+
+# Хендлер на команду "/contacts"
+@router.message(Command(commands='contacts'))
+async def contacts_command(message: Message):
+    await message.answer(text=LEXICON_RU['contacts'])
+
+# Хендлер на команду "/invite"
+@router.message(Command(commands='invite'))
+async def invite_command(message: Message):
+    await message.answer(text=f'{LEXICON_RU["invite"]}\n\nhttps://t.me/Molecule_nebula_bot')
