@@ -8,6 +8,7 @@ from handlers import menu_handlers, answer_to_buttons
 from aiogram.types import BotCommand
 from lexicon.lexicon_ru import LEXICON_MENU
 
+from aiogram.fsm.storage.memory import MemoryStorage
 
 # Логирование
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def set_main_menu(bot: Bot):
     main_menu_commands = [BotCommand(command=command, description=description) for command, description in LEXICON_MENU.items()]
     await bot.set_my_commands(main_menu_commands)
-    
+
 async def main():
     # Настройка логирования
     logging.basicConfig(
@@ -30,9 +31,12 @@ async def main():
     # Загрузка конфига
     config: Config = load_config()
 
+    # Инициализация хранилища (MemoryStorage) Нужен Redis?
+    storage = MemoryStorage()
+
     bot = Bot(token=config.tg_bot.token,
               parse_mode='HTML')
-    dp = Dispatcher()
+    dp = Dispatcher(storage=storage)
 
     # Меню бота
     await set_main_menu(bot)

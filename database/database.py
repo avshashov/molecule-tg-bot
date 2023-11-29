@@ -1,4 +1,4 @@
 # Демо база данных пользователей
 
 
-users_db = {}
+users_db: dict[int, str] = {}
