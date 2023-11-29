@@ -6,7 +6,6 @@ from database.database import users_db
 from keyboards.keyboards import menu_kb
 
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state, State, StatesGroup
 from FSM.fsm import FSM_SET_NAME
 
 router = Router()

@@ -20,6 +20,6 @@ project_button = KeyboardButton(text=LEXICON_RU['project'])
 
 menu_builder = ReplyKeyboardBuilder()
 
-menu_builder.row(announcements, events_button, rent_button, pictures_button, project_button, width=1)
+menu_builder.row(announcements, events_button, rent_button, pictures_button, project_button, width=2)
 
 menu_kb: ReplyKeyboardMarkup = menu_builder.as_markup(one_time_keyboard=True, resize_keyboard=True)
