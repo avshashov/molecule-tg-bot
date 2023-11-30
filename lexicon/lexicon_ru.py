@@ -6,7 +6,7 @@ LEXICON_MENU: dict[str, str] = {
 
 LEXICON_RU: dict[str, str] = {
     'of_course': 'Конечно)',
-    'another name': 'Нет, зови меня лучше так:',
+    'another name': 'Изменить имя',
     'unknown': 'Приветствую тебя, Незнакомец, я Небула - бот Молекулы\n\n'
                'Как я могу к тебе обращаться?',
     'your_name': 'Как мне к тебе обращаться?',
