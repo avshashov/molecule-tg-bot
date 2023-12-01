@@ -19,7 +19,7 @@ router = Router()
 @router.message(CommandStart())
 async def start_command(message: Message, state: FSMContext):
     if message.from_user.id in users_db:  # Если пользователь уже в базе
-        await message.answer(text=f'Приветствую тебя, {users_db[message.from_user.id]}, я Небула - бот Молекулы\n\n'
+        await message.answer(text=f'Приветствую тебя, {users_db[message.from_user.id]["name"]}, я Небула - бот Молекулы\n\n'
                                   f'{LEXICON_RU["text_menu"]}',
                                   reply_markup=menu_kb())
 
