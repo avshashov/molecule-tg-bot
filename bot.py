@@ -46,8 +46,7 @@ async def main():
     dp.include_router(answer_to_buttons.router)
 
     # Запуск поллинга
-    # Можно пропустить накопившиеся апдейты пока бот был не в сети
-    #await bot.delete_webhook(drop_pending_updates=True)
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
