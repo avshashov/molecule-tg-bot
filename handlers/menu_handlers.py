@@ -10,7 +10,6 @@ from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_SET_NAME
 
 
-
 router = Router()
 
 # Хендлер на команду "/start" - будет

@@ -8,9 +8,9 @@ from keyboards.keyboards import menu_kb, yes_no_name_kb
 from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_SET_NAME
 
-import asyncio
 
 router = Router()
+
 # Хендлер на кнопку "Конечно)" заносит пользователя в базу данных и выводит главное меню
 @router.callback_query(F.data == 'of_course')
 async def of_course_answer(callback: CallbackQuery):
