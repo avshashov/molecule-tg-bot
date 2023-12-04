@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from lexicon.lexicon_ru import LEXICON_RU
+from lexicon.lexicon_ru import LEXICON_RU, LEXICON_MENU_BUTTONS
 
 # Клавиатура с кнопками выбора ответа на вопрос как обращаться к пользователю
 def yes_no_kb() -> InlineKeyboardMarkup:
@@ -18,15 +18,16 @@ def yes_no_name_kb() -> InlineKeyboardMarkup:
     kb.adjust(2)
     return kb.as_markup()
 
-
 # Клавиатура главного меню
 def menu_kb() -> ReplyKeyboardMarkup:
     menu_builder = ReplyKeyboardBuilder()
-    menu_builder.button(text=LEXICON_RU['announcements'])
-    menu_builder.button(text=LEXICON_RU['projects'])
-    menu_builder.button(text=LEXICON_RU['rent'])
-    menu_builder.button(text=LEXICON_RU['pictures'])
-    menu_builder.button(text=LEXICON_RU['project'])
+    menu_builder.button(text=LEXICON_MENU_BUTTONS['announcements'])
+    menu_builder.button(text=LEXICON_MENU_BUTTONS['projects'])
+    menu_builder.button(text=LEXICON_MENU_BUTTONS['rent'])
+    menu_builder.button(text=LEXICON_MENU_BUTTONS['pictures'])
+    menu_builder.button(text=LEXICON_MENU_BUTTONS['project'])
     menu_builder.adjust(2)
 
     return menu_builder.as_markup(one_time_keyboard=True, resize_keyboard=True)
+
+# Клавиатура кнопки "О проекте"
