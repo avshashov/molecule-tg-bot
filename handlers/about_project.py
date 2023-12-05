@@ -25,5 +25,5 @@ async def projects_button(message: Message):
 
 # Хендлер на кнопку 'Скачать PDF презентацию'
 @router.callback_query(F.data == 'download_presentation')
-async def of_course_answer(callback: CallbackQuery, bot: Bot):
+async def download_presentation(callback: CallbackQuery, bot: Bot):
     await bot.send_document(chat_id=callback.from_user.id, document=preza['file_id'])
