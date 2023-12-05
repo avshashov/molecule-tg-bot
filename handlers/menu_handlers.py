@@ -1,6 +1,6 @@
 from aiogram import F, Router
 from aiogram.types import Message
-from aiogram.filters import Command, CommandStart, StateFilter
+from aiogram.filters import Command, CommandStart
 
 from database.database import users_db
 from keyboards.keyboards import yes_no_kb, menu_kb
