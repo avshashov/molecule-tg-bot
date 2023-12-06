@@ -1,8 +1,8 @@
 from aiogram import Bot
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
-from lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS, LEXICON_RU
-from database.database import presentation_id, preza, users_db
+from lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
+from database.database import presentation_id, preza
 from keyboards.keyboards import about_project, menu_kb
 
 router = Router()
@@ -14,8 +14,8 @@ async def projects_button(message: Message):
 
 
 # Хендлер чтобы поймать ID файла презентации
-#@router.message(F.document)
-#async def document(message: Message):
+# @router.message(F.document)
+# async def document(message: Message):
 #    print(message.model_dump_json())
 #    presentation_id['file_name'] = message.document.file_name
 #    presentation_id['file_id'] = message.document.file_id
@@ -32,4 +32,4 @@ async def download_presentation(callback: CallbackQuery, bot: Bot):
 # Хендлер на кнопку 'Главное меню'
 @router.callback_query(F.data == 'main_menu')
 async def main_menu_button(callback: CallbackQuery):
-    await callback.message.answer(text=LEXICON_RU["text_menu"], reply_markup=menu_kb())
+    await callback.message.answer(text=LEXICON_MENU_BUTTONS["text_menu"], reply_markup=menu_kb())
