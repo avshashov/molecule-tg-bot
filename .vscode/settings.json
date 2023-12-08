@@ -1,0 +1,1 @@
+{"python.formatting.provider" : " black " , "python.formatting.blackArgs": ["--line-length", "130"] , "editor.formatOnSave" : true, }
