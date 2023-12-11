@@ -7,6 +7,7 @@ from keyboards.keyboards import about_project, menu_kb
 
 router = Router()
 
+
 # Хендлер на кнопку меню 'О проекте'
 @router.message(F.text == LEXICON_MENU_BUTTONS['project'])
 async def projects_button(message: Message):

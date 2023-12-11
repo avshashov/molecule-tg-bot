@@ -11,6 +11,7 @@ from fsm.fsm import FSM_SET_NAME
 
 router = Router()
 
+
 # Хендлер на кнопку "ДА" заносит пользователя в базу данных и выводит главное меню
 @router.callback_query(F.data == 'of_course')
 async def of_course_answer(callback: CallbackQuery):
@@ -42,6 +43,8 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
     # заносим имя в базу из хранилища
     users_db[callback.from_user.id] = await state.get_data()
     await state.clear()
-    await callback.message.answer(text=f'Приветствую тебя, {users_db[callback.from_user.id]["name"]}!\n\n'
-                                       f'{LEXICON_MENU_BUTTONS["text_menu"]}',
-                                       reply_markup=menu_kb())
+    await callback.message.answer(
+        text=f'Приветствую тебя, {users_db[callback.from_user.id]["name"]}!\n\n'
+        f'{LEXICON_MENU_BUTTONS["text_menu"]}',
+        reply_markup=menu_kb()
+    )
