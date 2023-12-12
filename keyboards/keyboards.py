@@ -58,3 +58,29 @@ def rent() -> InlineKeyboardMarkup:
     kb.add(InlineKeyboardButton(text=LEXICON_MENU_BUTTONS['main_menu'], callback_data='main_menu'))
     kb.adjust(1)
     return kb.as_markup()
+
+
+# Клавиатура выбора способа связи (блок Аренда)
+def communication_method() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['call'], callback_data='call'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['telegram'], callback_data='telegram'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['whatsapp'], callback_data='whatsapp'))
+    kb.adjust(1)
+    return kb.as_markup()
+
+
+# Клавиатура выбора количества залов (блок Аренда)
+def how_room() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['one'], callback_data='one'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['two'], callback_data='two'))
+    kb.adjust(2)
+    return kb.as_markup()
+
+
+# Клавиатура - кнопка 'Отправить'(блок Аренда)
+def send() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
+    return kb.as_markup()

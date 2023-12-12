@@ -45,6 +45,6 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.answer(
         text=f'Приветствую тебя, {users_db[callback.from_user.id]["name"]}!\n\n'
-        f'{LEXICON_MENU_BUTTONS["text_menu"]}',
-        reply_markup=menu_kb()
+             f'{LEXICON_MENU_BUTTONS["text_menu"]}',
+             reply_markup=menu_kb()
     )
