@@ -2,7 +2,7 @@ from aiogram import F, Router, Bot
 from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery
 from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
-from database.database import photo_id, users_db
+from database.database import photo_room, users_db
 from keyboards.keyboards import rent, communication_method, how_room, send, menu_kb
 
 from aiogram.fsm.context import FSMContext
@@ -16,17 +16,15 @@ router = Router()
 # Хендлер чтобы поймать ID фоток
 #@router.message(F.photo)
 #async def photo(message: Message):
-#    photo_id.append(message.photo[2].file_id)
-#    print(photo_id)
+#    print(message.photo[2].file_id)
 
 
 # Хендлер на кнопку меню 'Аренда'
 @router.message(F.text == LEXICON_MENU_BUTTONS['rent'])
 async def rent_button(message: Message):
     await message.answer(text=LEXICON_RENT['rent'])
-    #await message.answer_media_group(media=photo_id)
+    await message.answer_media_group(media=photo_room)
     await message.answer(text='Оставляй заявку, если заинтересовало 👇', reply_markup=rent())
-    # Может нужно добавить очистку состояния? Если юзер нажмет кнопку Аренда в середине заполнения заявки
 
 
 # Хендлер будет срабатывать на команду "/cancel" в любых состояниях, кроме дефолтного
@@ -123,27 +121,41 @@ async def how_people_sent(message: Message, state: FSMContext):
 async def how_room_press(callback: CallbackQuery, state: FSMContext):
     await state.update_data(how_room=LEXICON_RENT[callback.data])
     await callback.message.delete()  # Удалить сообщение с кнопками
-    await callback.message.answer(text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n'
-                                       f'{LEXICON_RENT["finish"]}')
 
-    users_db[callback.from_user.id] = await state.get_data()
+    id = callback.from_user.id
+    data = await state.get_data()
     await state.clear()
 
-    await callback.message.answer(
-            text=f'Телефон: {users_db[callback.from_user.id]["enter_telephone"]}\n'
-                 f'Способ связи: {users_db[callback.from_user.id]["how_contact"]}\n'
-                 f'Дата: {users_db[callback.from_user.id]["date"]}\n'
-                 f'Мероприятие: {users_db[callback.from_user.id]["event"]}\n'
-                 f'Сколько человек: {users_db[callback.from_user.id]["how_people"]}\n'
-                 f'Залов требуется: {users_db[callback.from_user.id]["how_room"]}',
+    # Формирование сообщения заявки
+    text = f'''Имя: {users_db[id]["name"]}\n
+Телефон: {data["enter_telephone"]}\n
+Способ связи: {data["how_contact"]}\n
+Дата: {data["date"]}\n
+Мероприятие: {data["event"]}\n
+Сколько человек: {data["how_people"]}\n
+Залов требуется: {data["how_room"]}'''
 
-                 reply_markup=send()
-        )
+    await callback.message.answer(text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n'
+                                       f'{LEXICON_RENT["finish"]}\n\n'
+                                       f'{text}',
+                                       reply_markup=send())
+    await state.update_data(text=text)
+
+
+# Хендлер будет срабатывать, если во время выбора количества залов
+# будет отправлено что-то некорректное
+@router.message(StateFilter(FSM_RENT.how_room))
+async def warning_not_room(message: Message):
+    await message.answer(text=f'{LEXICON_RENT["not_room"]}\n\n'
+                              f'{LEXICON_RENT["breaking"]}')
 
 
 # Хендлер на кнопку 'Отправить'
 @router.callback_query(F.data == 'send')
-async def send_press(message: Message, bot: Bot):
-    await message.answer(text=LEXICON_RENT['sending'])
-    #await bot.send_message(chat_id=,
-    #                       text=f'{users_db[message.from_user.id]}')
+async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
+    await callback.message.delete()
+    await callback.message.answer(text=LEXICON_RENT['sending'])
+    data = await state.get_data()
+    await bot.send_message(chat_id=408413841,
+                           text=f'{data["text"]}')
+    await state.clear()

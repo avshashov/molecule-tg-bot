@@ -83,4 +83,6 @@ def how_room() -> InlineKeyboardMarkup:
 def send() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['rental_request'], callback_data='rental_request'))
+    kb.adjust(2)
     return kb.as_markup()
