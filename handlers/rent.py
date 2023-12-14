@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
 from database.database import photo_room, users_db
 from keyboards.keyboards import rent, communication_method, how_room, send, menu_kb
+from config_data.config import Config, load_config
 
 from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_RENT
@@ -158,6 +159,7 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(text=LEXICON_RENT['sending'])
     data = await state.get_data()
-    await bot.send_message(chat_id=408413841,
+    config: Config = load_config()
+    await bot.send_message(chat_id=config.tg_bot.admin_ids[0],
                            text=f'{data["text"]}')
     await state.clear()
