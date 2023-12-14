@@ -48,12 +48,14 @@ async def rental_request_button(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSM_RENT.enter_telephone)
 
 
-# Хендлер на введенный номер телефона,
+# Хендлер на введенный номер телефона или на присланный контакт,
 # переводит в состояние ожидания выбора способа связи
 @router.message(StateFilter(FSM_RENT.enter_telephone))
+@router.message(F.contact, StateFilter(FSM_RENT.enter_telephone))
 async def telephone_sent(message: Message, state: FSMContext):
-    text = message.text
-    if text.isdigit():
+    if message.text:
+        text = message.text
+    if (message.text and text.isdigit()) or message.contact:
         await state.update_data(enter_telephone=message.text)
         await message.answer(text=LEXICON_RENT['how_contact'], reply_markup=communication_method())
         await state.set_state(FSM_RENT.how_contact)
