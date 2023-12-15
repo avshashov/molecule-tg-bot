@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from lexicon.lexicon_ru import LEXICON_SET_USER_NAME, LEXICON_MENU_BUTTONS, LEXICON_ABOUT_PROJECT, LEXICON_RENT
 
@@ -36,16 +36,10 @@ def menu_kb() -> ReplyKeyboardMarkup:
 # Клавиатура кнопки "О проекте"
 def about_project() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.add(
-        InlineKeyboardButton(
-            text=LEXICON_ABOUT_PROJECT['go_website'], url='https://t.me/Molecule_nebula_bot'
-        )
-    )
-    kb.add(
-        InlineKeyboardButton(
-            text=LEXICON_ABOUT_PROJECT['download_presentation'], callback_data='download_presentation'
-        )
-    )
+    kb.add(InlineKeyboardButton(
+            text=LEXICON_ABOUT_PROJECT['go_website'], url='https://t.me/Molecule_nebula_bot'))
+    kb.add(InlineKeyboardButton(
+            text=LEXICON_ABOUT_PROJECT['download_presentation'], callback_data='download_presentation'))
     kb.add(InlineKeyboardButton(text=LEXICON_MENU_BUTTONS['main_menu'], callback_data='main_menu'))
     kb.adjust(1)
     return kb.as_markup()
@@ -83,7 +77,7 @@ def how_room() -> InlineKeyboardMarkup:
 def send() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
-    kb.add(InlineKeyboardButton(text=LEXICON_RENT['rental_request'], callback_data='rental_request'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['repeat_request'], callback_data='repeat_request'))
     kb.adjust(2)
     return kb.as_markup()
 
@@ -100,3 +94,10 @@ def cancel_rent() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['cancel_button'], callback_data='cancel_button'))
     return kb.as_markup()
+
+
+# Клавиатура - кнопка 'Отправить контакт'(блок Аренда)
+def send_contact() -> ReplyKeyboardMarkup:
+    kb = ReplyKeyboardBuilder()
+    kb.button(text=LEXICON_RENT['send_telephone'], request_contact=True)
+    return kb.as_markup(resize_keyboard=True)

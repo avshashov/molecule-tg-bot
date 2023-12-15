@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from config_data.config import Config, load_config
+from config_data.config import config
 from handlers import menu_handlers, set_user_name, about_project, rent
 
 from aiogram.types import BotCommand
@@ -34,7 +34,7 @@ async def main():
     logger.info('Starting bot')
 
     # Загрузка конфига
-    config: Config = load_config()
+    #config: Config = load_config()
 
     # Инициализация хранилища (MemoryStorage) Нужен Redis?
     storage = MemoryStorage()
