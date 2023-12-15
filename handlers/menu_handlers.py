@@ -57,3 +57,4 @@ async def invite_command(message: Message):
 @router.callback_query(F.data == 'main_menu')
 async def main_menu_button(callback: CallbackQuery):
     await callback.message.answer(text=LEXICON_MENU_BUTTONS["text_menu"], reply_markup=menu_kb())
+    await callback.answer()

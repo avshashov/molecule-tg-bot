@@ -35,8 +35,9 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
 
-# Хендлер на кнопку 'Оставить заявку на аренду помещения'
+# Хендлер на кнопку 'Оставить заявку на аренду помещения' и кнопку 'Исправить'
 # Устанавливает состояние ввода телефона
+@router.callback_query(F.data == 'repeat_request')
 @router.callback_query(F.data == 'rental_request')
 async def rental_request_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
@@ -70,6 +71,7 @@ async def how_contact_press(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()  # Удалить сообщение с кнопками
     await callback.message.answer(text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n'
                                        f'{LEXICON_RENT["date"]}')
+    await callback.answer()
     await state.set_state(FSM_RENT.date)
 
 
@@ -140,6 +142,7 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
                                        f'{LEXICON_RENT["finish"]}\n\n'
                                        f'{text}',
                                        reply_markup=send())
+    await callback.answer()
     await state.update_data(text=text)
 
 

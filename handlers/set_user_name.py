@@ -18,6 +18,7 @@ async def of_course_answer(callback: CallbackQuery):
     users_db[callback.from_user.id] = {'name': callback.from_user.full_name}
     await callback.message.edit_text(text='Отлично)\n\n')
     await callback.message.answer(text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb())
+    await callback.answer()
 
 
 # Хендлер на кнопку "Изменить имя" устанавливает машину состояний: ожидание ввода имени +
@@ -48,3 +49,4 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
              f'{LEXICON_MENU_BUTTONS["text_menu"]}',
              reply_markup=menu_kb()
     )
+    await callback.answer()
