@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery
 from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
 from database.database import photo_room, users_db
-from keyboards.keyboards import rent, communication_method, how_room, send, menu_kb
+from keyboards.keyboards import rent, communication_method, how_room, send, rental_request, cancel_rent
 from config_data.config import Config, load_config
 
 from aiogram.fsm.context import FSMContext
@@ -28,24 +28,24 @@ async def rent_button(message: Message):
     await message.answer(text='Оставляй заявку, если заинтересовало 👇', reply_markup=rent())
 
 
-# Хендлер будет срабатывать на команду "/cancel" в любых состояниях, кроме дефолтного
-@router.message(F.text == '/cancel', ~StateFilter(default_state))
-async def cancel_command(message: Message, state: FSMContext):
-    await message.answer(text=LEXICON_RENT['cancel'])
+# Хендлер на кнопку "cancel" в любых состояниях, кроме дефолтного
+@router.callback_query(F.data == 'cancel_button', ~StateFilter(default_state))
+async def cancel_button(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(text=LEXICON_RENT['cancel'], reply_markup=rental_request())
     await state.clear()
 
 
-# Хендлер будет срабатывать на команду "/cancel" в состоянии по умолчанию
-@router.message(F.text =='/cancel', StateFilter(default_state))
-async def cancel_default(message: Message):
-    await message.answer(text=LEXICON_RENT['cancel_default'])
+# Хендлер на кнопку "cancel" в состоянии по умолчанию
+@router.callback_query(F.data =='cancel_button', StateFilter(default_state))
+async def cancel_default(callback: CallbackQuery):
+    await callback.message.edit_text(text=LEXICON_RENT['cancel_default'], reply_markup=rental_request())
 
 
 # Хендлер на кнопку 'Оставить заявку на аренду помещения'
 # Устанавливает состояние ввода телефона
 @router.callback_query(F.data == 'rental_request')
 async def rental_request_button(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer(text=LEXICON_RENT['telephone'])
+    await callback.message.edit_text(text=LEXICON_RENT['telephone'])
     await state.set_state(FSM_RENT.enter_telephone)
 
 
@@ -54,15 +54,14 @@ async def rental_request_button(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.enter_telephone))
 @router.message(F.contact, StateFilter(FSM_RENT.enter_telephone))
 async def telephone_sent(message: Message, state: FSMContext):
-    if message.text:
-        text = message.text
-    if (message.text and text.isdigit()) or message.contact:
+    if (message.text and message.text.isdigit()) or message.contact:
         await state.update_data(enter_telephone=message.text)
         await message.answer(text=LEXICON_RENT['how_contact'], reply_markup=communication_method())
         await state.set_state(FSM_RENT.how_contact)
     else:
         await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n'
-                                  f'{LEXICON_RENT["breaking"]}')
+                                  f'{LEXICON_RENT["breaking"]}',
+                                  reply_markup=cancel_rent())
 
 
 # Хендлер на кнопки выбора способа связи,
@@ -82,7 +81,8 @@ async def how_contact_press(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.how_contact))
 async def warning_not_contact(message: Message):
     await message.answer(text=f'{LEXICON_RENT["not_contact"]}\n\n'
-                              f'{LEXICON_RENT["breaking"]}')
+                              f'{LEXICON_RENT["breaking"]}',
+                              reply_markup=cancel_rent())
 
 
 # Хендлер на введенную дату,
@@ -114,7 +114,8 @@ async def how_people_sent(message: Message, state: FSMContext):
         await state.set_state(FSM_RENT.how_room)
     else:
         await message.answer(text=f'{LEXICON_RENT["not_people"]}\n\n'
-                                  f'{LEXICON_RENT["breaking"]}')
+                                  f'{LEXICON_RENT["breaking"]}',
+                                  reply_markup=cancel_rent())
 
 
 # Хендлер на кнопки выбора количества залов,
@@ -150,7 +151,8 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.how_room))
 async def warning_not_room(message: Message):
     await message.answer(text=f'{LEXICON_RENT["not_room"]}\n\n'
-                              f'{LEXICON_RENT["breaking"]}')
+                              f'{LEXICON_RENT["breaking"]}',
+                              reply_markup=cancel_rent())
 
 
 # Хендлер на кнопку 'Отправить'

@@ -79,10 +79,24 @@ def how_room() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Отправить'(блок Аренда)
+# Клавиатура - кнопка 'Отправить' и кнопка 'Оставить заявку'(блок Аренда)
 def send() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['rental_request'], callback_data='rental_request'))
     kb.adjust(2)
+    return kb.as_markup()
+
+
+# Клавиатура - кнопка 'Оставить заявку'(блок Аренда)
+def rental_request() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['rental_request'], callback_data='rental_request'))
+    return kb.as_markup()
+
+
+# Клавиатура - кнопка 'Отмена'(блок Аренда)
+def cancel_rent() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['cancel_button'], callback_data='cancel_button'))
     return kb.as_markup()
