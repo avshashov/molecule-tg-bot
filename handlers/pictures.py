@@ -37,3 +37,15 @@ async def contact_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_2'], reply_markup=how_contact())
     await callback.answer()
     await state.set_state(FSM_PICTURE.how_contact)
+
+
+# Хендлер на кнопки 'Звонок', 'whatsapp', 'telegram'
+@router.callback_query(StateFilter(FSM_PICTURE.how_contact), F.data.in_(['call', 'telegram', 'whatsapp']))
+async def how_contact(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.delete()
+    await callback.message.answer(text=LEXICON_PICTURES['number'])
+    await state.set_state(FSM_PICTURE.enter_telephone)
+
+
+# Хендлер на кнопку 'email'
