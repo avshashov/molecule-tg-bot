@@ -33,7 +33,7 @@ router = Router()
 async def rent_button(message: Message):
     await message.answer(text=LEXICON_RENT['rent'])
     await message.answer_media_group(media=photo_room)
-    await message.answer(text='Оставляй заявку, если заинтересовало 👇', reply_markup=rent())
+    await message.answer(text='Оставляй заявку прямо здесь 👇', reply_markup=rent())
 
 
 # Хендлер на кнопку "cancel"
@@ -81,7 +81,7 @@ async def how_contact_press(callback: CallbackQuery, state: FSMContext):
     await state.update_data(how_contact=LEXICON_RENT[callback.data])
     await callback.message.delete()  # Удалить сообщение с кнопками
     await callback.message.answer(
-        text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["date"]}'
+        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["date"]}'
     )
     await callback.answer()
     await state.set_state(FSM_RENT.date)
@@ -151,7 +151,7 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
 Залов требуется: {data["how_room"]}'''
 
     await callback.message.answer(
-        text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["finish"]}\n\n' f'{text}',
+        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["finish"]}\n\n' f'{text}',
         reply_markup=send(),
     )
     await callback.answer()
