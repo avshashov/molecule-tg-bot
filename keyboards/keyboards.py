@@ -70,7 +70,7 @@ def rent() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура выбора способа связи (блок Аренда)
+# Клавиатура выбора способа связи
 def communication_method() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['call'], callback_data='call'))
@@ -80,7 +80,7 @@ def communication_method() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура выбора количества залов (блок Аренда)
+# Клавиатура выбора количества залов
 def how_room() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['one'], callback_data='one'))
@@ -89,7 +89,7 @@ def how_room() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Отправить' и кнопка 'Оставить заявку'(блок Аренда)
+# Клавиатура - кнопка 'Отправить' и кнопка 'Оставить заявку'
 def send() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
@@ -98,21 +98,21 @@ def send() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Оставить заявку'(блок Аренда)
+# Клавиатура - кнопка 'Оставить заявку'
 def rental_request() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['rental_request'], callback_data='rental_request'))
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Отмена'(блок Аренда)
+# Клавиатура - кнопка 'Отмена'
 def cancel_rent() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['cancel_button'], callback_data='cancel_button'))
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Отправить контакт'(блок Аренда)
+# Клавиатура - кнопка 'Отправить контакт'
 def send_contact() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardBuilder()
     kb.button(text=LEXICON_RENT['send_telephone'], request_contact=True)
@@ -134,6 +134,18 @@ def pictures() -> InlineKeyboardMarkup:
 # Клавиатура кнопки "Купить готовую"
 def buy_ready() ->InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['catalog_paintings'], callback_data='catalog_paintings'))
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['catalog_paintings'], url='https://disk.yandex.ru/d/1MSKch2JtaetfA'))
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['contact_me'], callback_data='contact_me'))
+    kb.adjust(1)
+    return kb.as_markup()
+
+
+# Клавиатура выбора способа связи
+def how_contact() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['call'], callback_data='call'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['telegram'], callback_data='telegram'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['whatsapp'], callback_data='whatsapp'))
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['email'], callback_data='email'))
+    kb.adjust(1)
     return kb.as_markup()

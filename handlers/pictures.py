@@ -5,12 +5,13 @@ from lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_PICTURES
 from database.database import users_db
 from keyboards.keyboards import (
     pictures,
-    buy_ready
+    buy_ready,
+    how_contact,
 )
 from config_data.config import config
 
 from aiogram.fsm.context import FSMContext
-#from fsm.fsm import
+from fsm.fsm import FSM_PICTURE
 from aiogram.fsm.state import default_state
 
 
@@ -26,5 +27,13 @@ async def pictures_button(message: Message):
 # Хендлер на кнопку 'Купить готовую'
 @router.callback_query(F.data == 'buy_ready')
 async def buy_button(callback: CallbackQuery):
-    await callback.message.edit_text(text=LEXICON_PICTURES['pictures'], reply_markup=buy_ready())
+    await callback.message.edit_text(text=LEXICON_PICTURES['buy_ready_description'], reply_markup=buy_ready())
     await callback.answer()
+
+
+# Хендлер на кнопку 'Свяжитесь со мной'
+@router.callback_query(F.data == 'contact_me')
+async def contact_button(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_2'], reply_markup=how_contact())
+    await callback.answer()
+    await state.set_state(FSM_PICTURE.how_contact)

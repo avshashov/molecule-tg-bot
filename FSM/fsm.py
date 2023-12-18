@@ -12,3 +12,7 @@ class FSM_RENT(StatesGroup):  # Состояние пользователя:
     event = State()  # Какое мероприятие
     how_people = State()  # Сколько человек
     how_room = State()  # Сколько залов (1 или 2)
+
+
+class FSM_PICTURE(StatesGroup):
+    how_contact = State()
