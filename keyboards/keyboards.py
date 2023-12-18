@@ -5,8 +5,10 @@ from lexicon.lexicon_ru import (
     LEXICON_MENU_BUTTONS,
     LEXICON_ABOUT_PROJECT,
     LEXICON_RENT,
+    LEXICON_PICTURES
 )
 
+# ----------------------------------<УСТАНОВКИ ИМЕНИ ПОЛЬЗОВАТЕЛЯ>--------------------------------------------------
 
 # Клавиатура с кнопками выбора ответа на вопрос как обращаться к пользователю
 def yes_no_kb() -> InlineKeyboardMarkup:
@@ -25,6 +27,7 @@ def yes_no_name_kb() -> InlineKeyboardMarkup:
     kb.adjust(2)
     return kb.as_markup()
 
+# ----------------------------------<ГЛАВНОЕ МЕНЮ>--------------------------------------------------
 
 # Клавиатура главного меню
 def menu_kb() -> ReplyKeyboardMarkup:
@@ -37,6 +40,7 @@ def menu_kb() -> ReplyKeyboardMarkup:
     menu_builder.adjust(2)
     return menu_builder.as_markup(one_time_keyboard=True, resize_keyboard=True)
 
+# ----------------------------------<БЛОК О ПРОЕКТЕ>--------------------------------------------------
 
 # Клавиатура кнопки "О проекте"
 def about_project() -> InlineKeyboardMarkup:
@@ -55,6 +59,7 @@ def about_project() -> InlineKeyboardMarkup:
     kb.adjust(1)
     return kb.as_markup()
 
+# ----------------------------------<БЛОК АРЕНДА>--------------------------------------------------
 
 # Клавиатура кнопки "Аренда"
 def rent() -> InlineKeyboardMarkup:
@@ -112,3 +117,15 @@ def send_contact() -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardBuilder()
     kb.button(text=LEXICON_RENT['send_telephone'], request_contact=True)
     return kb.as_markup(resize_keyboard=True)
+
+# ----------------------------------<БЛОК КАРТИНЫ>--------------------------------------------------
+
+# Клавиатура кнопки "Картины"
+def pictures() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['buy_ready'], callback_data='buy_ready'))
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['order_painting'], callback_data='order_painting'))
+    kb.row(*[InlineKeyboardButton(text=LEXICON_MENU_BUTTONS['main_menu'], callback_data='main_menu'),
+            InlineKeyboardButton(text=LEXICON_PICTURES['online_gallery'], callback_data='online_gallery')],
+            width=1)
+    return kb.as_markup()
