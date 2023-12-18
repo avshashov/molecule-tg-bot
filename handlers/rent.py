@@ -53,7 +53,10 @@ async def rental_request_button(callback: CallbackQuery, state: FSMContext):
 async def telephone_sent(message: Message, state: FSMContext):
     await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
     if (message.text and message.text.isdigit()) or message.contact:
-        await state.update_data(enter_telephone=message.text)
+        if message.text:
+            await state.update_data(enter_telephone=message.text)
+        elif message.contact:
+            await state.update_data(enter_telephone=message.contact.phone_number)
         await message.answer(text=LEXICON_RENT['how_contact'], reply_markup=communication_method())
         await state.set_state(FSM_RENT.how_contact)
     else:
