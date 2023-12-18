@@ -1,6 +1,11 @@
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from lexicon.lexicon_ru import LEXICON_SET_USER_NAME, LEXICON_MENU_BUTTONS, LEXICON_ABOUT_PROJECT, LEXICON_RENT
+from lexicon.lexicon_ru import (
+    LEXICON_SET_USER_NAME,
+    LEXICON_MENU_BUTTONS,
+    LEXICON_ABOUT_PROJECT,
+    LEXICON_RENT,
+)
 
 
 # Клавиатура с кнопками выбора ответа на вопрос как обращаться к пользователю
@@ -36,10 +41,16 @@ def menu_kb() -> ReplyKeyboardMarkup:
 # Клавиатура кнопки "О проекте"
 def about_project() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.add(InlineKeyboardButton(
-            text=LEXICON_ABOUT_PROJECT['go_website'], url='https://t.me/Molecule_nebula_bot'))
-    kb.add(InlineKeyboardButton(
-            text=LEXICON_ABOUT_PROJECT['download_presentation'], callback_data='download_presentation'))
+    kb.add(
+        InlineKeyboardButton(
+            text=LEXICON_ABOUT_PROJECT['go_website'], url='https://t.me/Molecule_nebula_bot'
+        )
+    )
+    kb.add(
+        InlineKeyboardButton(
+            text=LEXICON_ABOUT_PROJECT['download_presentation'], callback_data='download_presentation'
+        )
+    )
     kb.add(InlineKeyboardButton(text=LEXICON_MENU_BUTTONS['main_menu'], callback_data='main_menu'))
     kb.adjust(1)
     return kb.as_markup()
