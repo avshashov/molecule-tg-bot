@@ -129,3 +129,11 @@ def pictures() -> InlineKeyboardMarkup:
             InlineKeyboardButton(text=LEXICON_PICTURES['online_gallery'], callback_data='online_gallery')],
             width=1)
     return kb.as_markup()
+
+
+# Клавиатура кнопки "Купить готовую"
+def buy_ready() ->InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['catalog_paintings'], callback_data='catalog_paintings'))
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['contact_me'], callback_data='contact_me'))
+    return kb.as_markup()
