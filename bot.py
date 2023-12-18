@@ -2,8 +2,8 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from config_data.config import Config, load_config
-from handlers import menu_handlers, set_user_name, about_project
+from config_data.config import config
+from handlers import menu_handlers, set_user_name, about_project, rent
 
 from aiogram.types import BotCommand
 from lexicon.lexicon_ru import LEXICON_SET_MENU
@@ -34,7 +34,7 @@ async def main():
     logger.info('Starting bot')
 
     # Загрузка конфига
-    config: Config = load_config()
+    #config: Config = load_config()
 
     # Инициализация хранилища (MemoryStorage) Нужен Redis?
     storage = MemoryStorage()
@@ -49,6 +49,7 @@ async def main():
     dp.include_router(menu_handlers.router)
     dp.include_router(set_user_name.router)
     dp.include_router(about_project.router)
+    dp.include_router(rent.router)
 
     # Запуск поллинга
     await bot.delete_webhook(drop_pending_updates=True)

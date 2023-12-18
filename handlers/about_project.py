@@ -3,7 +3,7 @@ from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
 from database.database import presentation_id, preza
-from keyboards.keyboards import about_project, menu_kb
+from keyboards.keyboards import about_project
 
 router = Router()
 
@@ -28,9 +28,4 @@ async def projects_button(message: Message):
 @router.callback_query(F.data == 'download_presentation')
 async def download_presentation(callback: CallbackQuery, bot: Bot):
     await bot.send_document(chat_id=callback.from_user.id, document=preza['file_id'])
-
-
-# Хендлер на кнопку 'Главное меню'
-@router.callback_query(F.data == 'main_menu')
-async def main_menu_button(callback: CallbackQuery):
-    await callback.message.answer(text=LEXICON_MENU_BUTTONS["text_menu"], reply_markup=menu_kb())
+    await callback.answer()

@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command, CommandStart
 
 from database.database import users_db
@@ -51,3 +51,10 @@ async def contacts_command(message: Message):
 @router.message(Command(commands='invite'))
 async def invite_command(message: Message):
     await message.answer(text=f'{LEXICON_MENU_BUTTONS["invite"]}\n\nhttps://t.me/Molecule_nebula_bot')
+
+
+# Хендлер на кнопку 'Главное меню'
+@router.callback_query(F.data == 'main_menu')
+async def main_menu_button(callback: CallbackQuery):
+    await callback.message.answer(text=LEXICON_MENU_BUTTONS["text_menu"], reply_markup=menu_kb())
+    await callback.answer()
