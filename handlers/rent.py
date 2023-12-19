@@ -59,8 +59,8 @@ async def rental_request_button(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.enter_telephone))
 @router.message(F.contact, StateFilter(FSM_RENT.enter_telephone))
 async def telephone_sent(message: Message, state: FSMContext):
-    await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
     if (message.text and message.text.isdigit()) or message.contact:
+        await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
         if message.text:
             await state.update_data(enter_telephone=message.text)
         elif message.contact:

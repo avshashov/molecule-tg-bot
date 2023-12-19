@@ -60,31 +60,46 @@ async def email_button(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSM_PICTURE.enter_email)
 
 
-# Хендлер на введенный номер телефона или на присланный контакт
+# Хендлер на введенный номер телефона, email или на присланный контакт
+@router.message(StateFilter(FSM_PICTURE.enter_email))
 @router.message(StateFilter(FSM_PICTURE.enter_telephone))
 @router.message(F.contact, StateFilter(FSM_PICTURE.enter_telephone))
 async def contact_sent(message: Message, state: FSMContext):
-    if (message.text and message.text.isdigit()) or message.contact:
+    text = ''
+    id = message.from_user.id
+    # Если состояние - ввод телефона
+    if (FSM_PICTURE.enter_telephone == await state.get_state()) and (
+        (message.text and message.text.isdigit()) or message.contact
+        ):
         await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
         if message.text:
             await state.update_data(enter_telephone=message.text)
         elif message.contact:
             await state.update_data(enter_telephone=message.contact.phone_number)
 
-        id = message.from_user.id
         data = await state.get_data()
-        await state.clear()
-
-        # Формирование сообщения
+        # Формирование сообщения если указан телефон
         text = f'''Что хочу: хочу купить картину
 Имя: {users_db[id]["name"]}
 Телефон: {data["enter_telephone"]}
 Способ связи: {data["how_contact"]}\n'''
 
+
+    # Если состояние - ввод email
+    if FSM_PICTURE.enter_email == await state.get_state():
+        # Формирование сообщения если указан email
+        text = f'''Что хочу: хочу купить картину
+Имя: {users_db[id]["name"]}
+E-mail: {message.text}'''
+
+    # Если сообщение сформировано
+    if text:
         await message.answer(
             text=f'Проверь данные -\n\n{text}\nЕсли верно - жми "Отправить", если нет - "Исправить"',
             reply_markup=send(),
         )
+        await state.clear()
         await state.update_data(text=text)
+    #Если пользователь указал какую-то дичь вместо телефона
     else:
         await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n' f'{LEXICON_PICTURES["breaking"]}')
