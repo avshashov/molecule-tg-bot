@@ -6,7 +6,8 @@ from database.database import users_db
 from keyboards.keyboards import (
     pictures,
     buy_ready,
-    how_contact,
+    method_contact,
+    send_contact,
 )
 from config_data.config import config
 
@@ -34,7 +35,7 @@ async def buy_button(callback: CallbackQuery):
 # Хендлер на кнопку 'Свяжитесь со мной'
 @router.callback_query(F.data == 'contact_me')
 async def contact_button(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_2'], reply_markup=how_contact())
+    await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_2'], reply_markup=method_contact())
     await callback.answer()
     await state.set_state(FSM_PICTURE.how_contact)
 
@@ -44,8 +45,14 @@ async def contact_button(callback: CallbackQuery, state: FSMContext):
 async def how_contact(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.delete()
-    await callback.message.answer(text=LEXICON_PICTURES['number'])
+    await callback.message.answer(text=LEXICON_PICTURES['number'], reply_markup=send_contact())
     await state.set_state(FSM_PICTURE.enter_telephone)
 
 
 # Хендлер на кнопку 'email'
+@router.callback_query(StateFilter(FSM_PICTURE.how_contact), F.data == 'email')
+async def email_button(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.delete()
+    await callback.message.answer(text=LEXICON_PICTURES['enter_email'])
+    await state.set_state(FSM_PICTURE.enter_telephone)

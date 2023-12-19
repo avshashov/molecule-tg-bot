@@ -132,7 +132,7 @@ def pictures() -> InlineKeyboardMarkup:
 
 
 # Клавиатура кнопки "Купить готовую"
-def buy_ready() ->InlineKeyboardMarkup:
+def buy_ready() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['catalog_paintings'], url='https://disk.yandex.ru/d/1MSKch2JtaetfA'))
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['contact_me'], callback_data='contact_me'))
@@ -141,7 +141,7 @@ def buy_ready() ->InlineKeyboardMarkup:
 
 
 # Клавиатура выбора способа связи
-def how_contact() -> InlineKeyboardMarkup:
+def method_contact() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['call'], callback_data='call'))
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['telegram'], callback_data='telegram'))
