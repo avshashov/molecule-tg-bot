@@ -17,3 +17,4 @@ class FSM_RENT(StatesGroup):  # Состояние пользователя:
 class FSM_PICTURE(StatesGroup):
     how_contact = State()
     enter_telephone = State()
+    enter_email = State()

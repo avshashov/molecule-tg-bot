@@ -89,7 +89,7 @@ def how_room() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Отправить' и кнопка 'Оставить заявку'
+# Клавиатура - кнопка 'Отправить' и кнопка 'Исправить'
 def send() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
