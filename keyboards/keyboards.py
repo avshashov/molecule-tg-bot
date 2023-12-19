@@ -149,3 +149,12 @@ def method_contact() -> InlineKeyboardMarkup:
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['email'], callback_data='email'))
     kb.adjust(1)
     return kb.as_markup()
+
+
+# Клавиатура - кнопка 'Отправить' и кнопка 'Исправить'
+def send() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['repeat_request'], callback_data='repeat_request'))
+    kb.adjust(2)
+    return kb.as_markup()

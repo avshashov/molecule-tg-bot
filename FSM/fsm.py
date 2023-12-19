@@ -12,6 +12,7 @@ class FSM_RENT(StatesGroup):  # Состояние пользователя:
     event = State()  # Какое мероприятие
     how_people = State()  # Сколько человек
     how_room = State()  # Сколько залов (1 или 2)
+    send_rent = State() # Состояние готовности к отправке сообщения админам
 
 
 class FSM_PICTURE(StatesGroup):

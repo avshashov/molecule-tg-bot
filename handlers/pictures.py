@@ -64,26 +64,27 @@ async def email_button(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_PICTURE.enter_telephone))
 @router.message(F.contact, StateFilter(FSM_PICTURE.enter_telephone))
 async def contact_sent(message: Message, state: FSMContext):
-    await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
     if (message.text and message.text.isdigit()) or message.contact:
+        await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
         if message.text:
             await state.update_data(enter_telephone=message.text)
         elif message.contact:
             await state.update_data(enter_telephone=message.contact.phone_number)
-    else:
-        await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n' f'{LEXICON_PICTURES["breaking"]}')
 
-    id = message.from_user.id
-    data = await state.get_data()
-    await state.clear()
+        id = message.from_user.id
+        data = await state.get_data()
+        await state.clear()
 
-    # Формирование сообщения
-    text = f'''Имя: {users_db[id]["name"]}
+        # Формирование сообщения
+        text = f'''Что хочу: хочу купить картину
+Имя: {users_db[id]["name"]}
 Телефон: {data["enter_telephone"]}
 Способ связи: {data["how_contact"]}\n'''
 
-    await message.answer(
-        text=f'Проверь данные -\n\n{text}\nЕсли верно - жми "Отправить", если нет - "Исправить"',
-        reply_markup=send(),
-    )
-    await state.update_data(text=text)
+        await message.answer(
+            text=f'Проверь данные -\n\n{text}\nЕсли верно - жми "Отправить", если нет - "Исправить"',
+            reply_markup=send(),
+        )
+        await state.update_data(text=text)
+    else:
+        await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n' f'{LEXICON_PICTURES["breaking"]}')

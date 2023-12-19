@@ -45,7 +45,7 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
 
 # Хендлер на кнопку 'Оставить заявку на аренду помещения' и кнопку 'Исправить'
 # Устанавливает состояние ввода телефона
-@router.callback_query(F.data == 'repeat_request')
+@router.callback_query(F.data == 'repeat_request', StateFilter(FSM_RENT.send_rent))
 @router.callback_query(F.data == 'rental_request')
 async def rental_request_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
@@ -142,7 +142,8 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
     # Формирование сообщения заявки
-    text = f'''Имя: {users_db[id]["name"]}\n
+    text = f'''Что хочу: хочу арендовать помещение
+Имя: {users_db[id]["name"]}\n
 Телефон: {data["enter_telephone"]}\n
 Способ связи: {data["how_contact"]}\n
 Дата: {data["date"]}\n
@@ -155,6 +156,7 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
         reply_markup=send(),
     )
     await callback.answer()
+    await state.set_state(FSM_RENT.send_rent)
     await state.update_data(text=text)
 
 
@@ -168,7 +170,7 @@ async def warning_not_room(message: Message):
 
 
 # Хендлер на кнопку 'Отправить'
-@router.callback_query(F.data == 'send')
+@router.callback_query(StateFilter(FSM_RENT.send_rent), F.data == 'send')
 async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.message.delete()
     data = await state.get_data()
