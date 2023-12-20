@@ -152,9 +152,9 @@ def method_contact() -> InlineKeyboardMarkup:
 
 
 # Клавиатура - кнопка 'Отправить' и кнопка 'Исправить'
-def send() -> InlineKeyboardMarkup:
+def send_correct() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send'))
-    kb.add(InlineKeyboardButton(text=LEXICON_RENT['repeat_request'], callback_data='repeat_request'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send_contact'))
+    kb.add(InlineKeyboardButton(text=LEXICON_RENT['repeat_request'], callback_data='correct'))
     kb.adjust(2)
     return kb.as_markup()

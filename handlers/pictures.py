@@ -8,7 +8,7 @@ from keyboards.keyboards import (
     buy_ready,
     method_contact,
     send_contact,
-    send,
+    send_correct,
 )
 from config_data.config import config
 
@@ -33,7 +33,8 @@ async def buy_button(callback: CallbackQuery):
     await callback.answer()
 
 
-# Хендлер на кнопку 'Свяжитесь со мной'
+# Хендлер на кнопку 'Свяжитесь со мной' и кнопку 'Исправить'
+@router.callback_query(F.data == 'correct', StateFilter(FSM_PICTURE.send))
 @router.callback_query(F.data == 'contact_me')
 async def contact_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_2'], reply_markup=method_contact())
@@ -84,7 +85,6 @@ async def contact_sent(message: Message, state: FSMContext):
 Телефон: {data["enter_telephone"]}
 Способ связи: {data["how_contact"]}\n'''
 
-
     # Если состояние - ввод email
     if FSM_PICTURE.enter_email == await state.get_state():
         # Формирование сообщения если указан email
@@ -96,10 +96,25 @@ E-mail: {message.text}'''
     if text:
         await message.answer(
             text=f'Проверь данные -\n\n{text}\nЕсли верно - жми "Отправить", если нет - "Исправить"',
-            reply_markup=send(),
+            reply_markup=send_correct(),
         )
         await state.clear()
-        await state.update_data(text=text)
+        await state.set_state(FSM_PICTURE.send)
+        await state.update_data(text=text)  # Сохранение текста заявки в хранилище
     #Если пользователь указал какую-то дичь вместо телефона
     else:
         await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n' f'{LEXICON_PICTURES["breaking"]}')
+
+
+# Хендлер на кнопку 'Отправить'
+@router.callback_query(StateFilter(FSM_PICTURE.send), F.data == 'send_contact')
+async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
+    await callback.message.delete()
+    data = await state.get_data()
+    await callback.message.answer(text=LEXICON_PICTURES['finish_2'])
+    # Отправка пользователю данных заявки
+    await callback.message.answer(text=f'{data["text"]}')
+    # Отправка заявки в чат с админами
+    await bot.send_message(chat_id=config.tg_bot.admin_ids[0], text=f'{data["text"]}')
+    await callback.answer()
+    await state.clear()

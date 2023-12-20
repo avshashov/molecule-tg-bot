@@ -19,3 +19,4 @@ class FSM_PICTURE(StatesGroup):
     how_contact = State()
     enter_telephone = State()
     enter_email = State()
+    send = State()
