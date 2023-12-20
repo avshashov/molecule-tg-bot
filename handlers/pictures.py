@@ -64,9 +64,8 @@ async def how_contact(callback: CallbackQuery, state: FSMContext):
 # Хендлер будет срабатывать, если во время выбора способа связи
 # будет отправлено что-то некорректное
 @router.message(StateFilter(FSM_PICTURE.how_contact))
-async def warning_not_contact(callback: CallbackQuery):
-    await callback.message.delete()
-    await callback.message.answer(
+async def warning_not_contact(message: Message):
+    await message.answer(
         text=f'{LEXICON_RENT["not_contact"]}\n\n' f'{LEXICON_PICTURES["breaking"]}', reply_markup=method_contact()
     )
 
@@ -107,7 +106,7 @@ async def contact_sent(message: Message, state: FSMContext):
     # Если состояние - ввод email
     if FSM_PICTURE.enter_email == await state.get_state():
         # Формирование сообщения если указан email
-        text = f'''Что хочу: хочу купить картину
+        text = f'''Заказ: Готовая картина
 Имя: {users_db[id]["name"]}
 E-mail: {message.text}'''
 
