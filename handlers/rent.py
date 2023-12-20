@@ -41,6 +41,7 @@ async def rent_button(message: Message):
 async def cancel_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_RENT['cancel'], reply_markup=rental_request())
     await state.clear()
+    await callback.answer()
 
 
 # Хендлер на кнопку 'Оставить заявку на аренду помещения' и кнопку 'Исправить'

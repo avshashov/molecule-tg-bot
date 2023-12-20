@@ -98,10 +98,11 @@ def send() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-# Клавиатура - кнопка 'Оставить заявку'
+# Клавиатура - кнопка 'Оставить заявку' и 'Главное меню'
 def rental_request() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['rental_request'], callback_data='rental_request'))
+    kb.add(InlineKeyboardButton(text=LEXICON_MENU_BUTTONS['main_menu'], callback_data='main_menu'))
     return kb.as_markup()
 
 
@@ -147,6 +148,7 @@ def method_contact() -> InlineKeyboardMarkup:
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['telegram'], callback_data='telegram'))
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['whatsapp'], callback_data='whatsapp'))
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['email'], callback_data='email'))
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['cancel_button'], callback_data='cancel_button_pictures'))
     kb.adjust(1)
     return kb.as_markup()
 
@@ -157,4 +159,11 @@ def send_correct() -> InlineKeyboardMarkup:
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['send'], callback_data='send_contact'))
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['repeat_request'], callback_data='correct'))
     kb.adjust(2)
+    return kb.as_markup()
+
+
+# Клавиатура - кнопка 'Отменить'
+def cancel_picture() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['cancel_button'], callback_data='cancel_button_pictures'))
     return kb.as_markup()

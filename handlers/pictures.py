@@ -9,6 +9,7 @@ from keyboards.keyboards import (
     method_contact,
     send_contact,
     send_correct,
+    cancel_picture,
 )
 from config_data.config import config
 
@@ -42,6 +43,14 @@ async def contact_button(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSM_PICTURE.how_contact)
 
 
+# Хендлер на кнопку "Отменить"
+@router.callback_query(F.data == 'cancel_button_pictures', ~StateFilter(default_state))
+async def cancel_button(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(text=LEXICON_PICTURES['cancel_process'], reply_markup=pictures())
+    await state.clear()
+    await callback.answer()
+
+
 # Хендлер на кнопки 'Звонок', 'whatsapp', 'telegram'
 @router.callback_query(StateFilter(FSM_PICTURE.how_contact), F.data.in_(['call', 'telegram', 'whatsapp']))
 async def how_contact(callback: CallbackQuery, state: FSMContext):
@@ -50,6 +59,16 @@ async def how_contact(callback: CallbackQuery, state: FSMContext):
     await state.update_data(how_contact=LEXICON_RENT[callback.data])
     await callback.message.answer(text=LEXICON_PICTURES['number'], reply_markup=send_contact())
     await state.set_state(FSM_PICTURE.enter_telephone)
+
+
+# Хендлер будет срабатывать, если во время выбора способа связи
+# будет отправлено что-то некорректное
+@router.message(StateFilter(FSM_PICTURE.how_contact))
+async def warning_not_contact(callback: CallbackQuery):
+    await callback.message.delete()
+    await callback.message.answer(
+        text=f'{LEXICON_RENT["not_contact"]}\n\n' f'{LEXICON_PICTURES["breaking"]}', reply_markup=method_contact()
+    )
 
 
 # Хендлер на кнопку 'email'
@@ -103,7 +122,7 @@ E-mail: {message.text}'''
         await state.update_data(text=text)  # Сохранение текста заявки в хранилище
     #Если пользователь указал какую-то дичь вместо телефона
     else:
-        await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n' f'{LEXICON_PICTURES["breaking"]}')
+        await message.answer(text=f'{LEXICON_RENT["not_telephone"]}\n\n' f'{LEXICON_PICTURES["breaking"]}', reply_markup=cancel_picture())
 
 
 # Хендлер на кнопку 'Отправить'
