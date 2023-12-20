@@ -34,13 +34,17 @@ async def buy_button(callback: CallbackQuery):
     await callback.answer()
 
 
-# Хендлер на кнопку 'Свяжитесь со мной' и кнопку 'Исправить'
+# Хендлер на кнопку 'Свяжитесь со мной' и кнопку 'Исправить' а также на кнопку 'Заказать картину'
 @router.callback_query(F.data == 'correct', StateFilter(FSM_PICTURE.send))
 @router.callback_query(F.data == 'contact_me')
+@router.callback_query(F.data == 'order_painting')
 async def contact_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_2'], reply_markup=method_contact())
     await callback.answer()
-    await state.set_state(FSM_PICTURE.how_contact)
+    if callback.data in ['contact_me', 'correct']:
+        await state.set_state(FSM_PICTURE.how_contact_buy_ready)
+    elif callback.data == 'order_painting':
+        await state.set_state(FSM_PICTURE.how_contact_order)
 
 
 # Хендлер на кнопку "Отменить"
@@ -52,18 +56,19 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
 
 
 # Хендлер на кнопки 'Звонок', 'whatsapp', 'telegram'
-@router.callback_query(StateFilter(FSM_PICTURE.how_contact), F.data.in_(['call', 'telegram', 'whatsapp']))
+@router.callback_query(StateFilter(FSM_PICTURE.how_contact_buy_ready, FSM_PICTURE.how_contact_order), F.data.in_(['call', 'telegram', 'whatsapp']))
 async def how_contact(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.delete()
     await state.update_data(how_contact=LEXICON_RENT[callback.data])
     await callback.message.answer(text=LEXICON_PICTURES['number'], reply_markup=send_contact())
-    await state.set_state(FSM_PICTURE.enter_telephone)
+    if FSM_PICTURE.how_contact_buy_ready == await state.get_state():
+        await state.set_state(FSM_PICTURE.enter_telephone_buy_ready)
 
 
 # Хендлер будет срабатывать, если во время выбора способа связи
 # будет отправлено что-то некорректное
-@router.message(StateFilter(FSM_PICTURE.how_contact))
+@router.message(StateFilter(FSM_PICTURE.how_contact_buy_ready))
 async def warning_not_contact(message: Message):
     await message.answer(
         text=f'{LEXICON_RENT["not_contact"]}\n\n' f'{LEXICON_PICTURES["breaking"]}', reply_markup=method_contact()
@@ -71,23 +76,23 @@ async def warning_not_contact(message: Message):
 
 
 # Хендлер на кнопку 'email'
-@router.callback_query(StateFilter(FSM_PICTURE.how_contact), F.data == 'email')
+@router.callback_query(StateFilter(FSM_PICTURE.how_contact_buy_ready), F.data == 'email')
 async def email_button(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.delete()
     await callback.message.answer(text=LEXICON_PICTURES['enter_email'])
-    await state.set_state(FSM_PICTURE.enter_email)
+    await state.set_state(FSM_PICTURE.enter_email_buy_ready)
 
 
 # Хендлер на введенный номер телефона, email или на присланный контакт
-@router.message(StateFilter(FSM_PICTURE.enter_email))
-@router.message(StateFilter(FSM_PICTURE.enter_telephone))
-@router.message(F.contact, StateFilter(FSM_PICTURE.enter_telephone))
+@router.message(StateFilter(FSM_PICTURE.enter_email_buy_ready))
+@router.message(StateFilter(FSM_PICTURE.enter_telephone_buy_ready))
+@router.message(F.contact, StateFilter(FSM_PICTURE.enter_telephone_buy_ready))
 async def contact_sent(message: Message, state: FSMContext):
     text = ''
     id = message.from_user.id
     # Если состояние - ввод телефона
-    if (FSM_PICTURE.enter_telephone == await state.get_state()) and (
+    if (FSM_PICTURE.enter_telephone_buy_ready == await state.get_state()) and (
         (message.text and message.text.isdigit()) or message.contact
         ):
         await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
@@ -98,13 +103,13 @@ async def contact_sent(message: Message, state: FSMContext):
 
         data = await state.get_data()
         # Формирование сообщения если указан телефон
-        text = f'''Что хочу: хочу купить картину
+        text = f'''Заказ: Готовая картина
 Имя: {users_db[id]["name"]}
 Телефон: {data["enter_telephone"]}
 Способ связи: {data["how_contact"]}\n'''
 
     # Если состояние - ввод email
-    if FSM_PICTURE.enter_email == await state.get_state():
+    if FSM_PICTURE.enter_email_buy_ready == await state.get_state():
         # Формирование сообщения если указан email
         text = f'''Заказ: Готовая картина
 Имя: {users_db[id]["name"]}
