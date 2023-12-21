@@ -45,6 +45,7 @@ async def contact_button(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     if callback.data in ['contact_me', 'correct']:
         await callback.message.edit_text(text=LEXICON_PICTURES['pictures'], reply_markup=pictures())
+        await state.clear()
     elif callback.data == 'order_painting':
         await state.set_state(FSM_PICTURE.how_contact_order)
 
@@ -211,9 +212,20 @@ async def color(message: Message, state: FSMContext):
 
     data = await state.get_data()
 
-    if data["text"]:
+    if "text" in data:
     # Формирование сообщения если указан телефон
         text = data["text"] + f'''\nКому картина: {data["for_whom"]}
+Событие: {data["event"]}
+Размер: {data["size"]}
+Настроение: {data["mood"]}
+Цвета: {data["color"]}\n'''
+
+    # Формирование сообщения если указан емайл
+    elif "enter_email" in data:
+        text = f'''Заказ картины
+Имя: {users_db[id]["name"]}
+Email: {data["enter_email"]}
+Кому картина: {data["for_whom"]}
 Событие: {data["event"]}
 Размер: {data["size"]}
 Настроение: {data["mood"]}
