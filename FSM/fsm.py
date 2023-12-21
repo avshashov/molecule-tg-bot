@@ -19,7 +19,14 @@ class FSM_PICTURE(StatesGroup):
     how_contact_buy_ready = State()
     enter_telephone_buy_ready = State()
     enter_email_buy_ready = State()
+
     send = State()
+
     enter_telephone_order = State()
     enter_email_order = State()
     how_contact_order = State()
+    for_whom = State()  # Для кого картина
+    event = State()  # По какому случаю
+    size = State()  # Какого размера
+    mood = State()  # Какое настроение
+    color = State() # Цветовая гамма
