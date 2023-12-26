@@ -143,7 +143,7 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
     # Формирование сообщения заявки
-    text = f'''Заказ: Аренда помещения
+    text = f'''Заказ: Аренда помещения\n
 Имя: {users_db[id]["name"]}\n
 Телефон: {data["enter_telephone"]}\n
 Способ связи: {data["how_contact"]}\n
