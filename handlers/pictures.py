@@ -19,7 +19,6 @@ from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_PICTURE
 from aiogram.fsm.state import default_state
 
-
 router = Router()
 
 
@@ -27,37 +26,37 @@ router = Router()
 def creat_text(users_db, id, mode: str, **kwargs) -> str:
     if mode == 'ready':
         if 'enter_telephone' in kwargs:
-            text = f'Заказ: Готовая картина\n\n'\
-            f'Имя: {users_db[id]["name"]}\n'\
-            f'Телефон: {kwargs["enter_telephone"]}\n'\
-            f'Способ связи: {kwargs["how_contact"]}'
-    
+            text = f'Заказ: Готовая картина\n\n' \
+                   f'Имя: {users_db[id]["name"]}\n' \
+                   f'Телефон: {kwargs["enter_telephone"]}\n' \
+                   f'Способ связи: {kwargs["how_contact"]}'
+
         elif 'enter_email' in kwargs:
-            text = f'Заказ: Готовая картина\n\n'\
-            f'Имя: {users_db[id]["name"]}\n'\
-            f'E-mail: {kwargs["enter_email"]}'
-    
+            text = f'Заказ: Готовая картина\n\n' \
+                   f'Имя: {users_db[id]["name"]}\n' \
+                   f'E-mail: {kwargs["enter_email"]}'
+
     elif mode == 'order':
         if "enter_telephone" in kwargs:
-            text = f'Заказ картины\n\n'\
-            f'Имя: {users_db[id]["name"]}\n'\
-            f'Телефон: {kwargs["enter_telephone"]}\n'\
-            f'Способ связи: {kwargs["how_contact"]}\n'\
-            f'Кому картина: {kwargs["for_whom"]}\n'\
-            f'Событие: {kwargs["event"]}\n'\
-            f'Размер: {kwargs["size"]}\n'\
-            f'Настроение: {kwargs["mood"]}\n'\
-            f'Цвета: {kwargs["color"]}'
-        
+            text = f'Заказ картины\n\n' \
+                   f'Имя: {users_db[id]["name"]}\n' \
+                   f'Телефон: {kwargs["enter_telephone"]}\n' \
+                   f'Способ связи: {kwargs["how_contact"]}\n' \
+                   f'Кому картина: {kwargs["for_whom"]}\n' \
+                   f'Событие: {kwargs["event"]}\n' \
+                   f'Размер: {kwargs["size"]}\n' \
+                   f'Настроение: {kwargs["mood"]}\n' \
+                   f'Цвета: {kwargs["color"]}'
+
         elif "enter_email" in kwargs:
-            text = f'Заказ картины\n\n'\
-            f'Имя: {users_db[id]["name"]}\n'\
-            f'Email: {kwargs["enter_email"]}\n'\
-            f'Кому картина: {kwargs["for_whom"]}\n'\
-            f'Событие: {kwargs["event"]}\n'\
-            f'Размер: {kwargs["size"]}\n'\
-            f'Настроение: {kwargs["mood"]}\n'\
-            f'Цвета: {kwargs["color"]}'
+            text = f'Заказ картины\n\n' \
+                   f'Имя: {users_db[id]["name"]}\n' \
+                   f'Email: {kwargs["enter_email"]}\n' \
+                   f'Кому картина: {kwargs["for_whom"]}\n' \
+                   f'Событие: {kwargs["event"]}\n' \
+                   f'Размер: {kwargs["size"]}\n' \
+                   f'Настроение: {kwargs["mood"]}\n' \
+                   f'Цвета: {kwargs["color"]}'
     return text
 
 
@@ -95,6 +94,13 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_PICTURES['cancel_process'], reply_markup=pictures())
     await state.clear()
     await callback.answer()
+
+
+# Хендлер на кнопку "Назад" - Возвращает на ша назад
+@router.callback_query(F.data == 'back_pictures')
+async def back_button(callback: CallbackQuery):
+    await callback.message.edit_text(text=LEXICON_PICTURES['pictures'], reply_markup=pictures())
+    await callback.answer() 
 
 
 # Хендлер на кнопки 'Звонок', 'whatsapp', 'telegram'
@@ -153,7 +159,7 @@ async def email_process(message: Message, state: FSMContext):
         await state.update_data(text=text)
     elif FSM_PICTURE.enter_email_order == await state.get_state():
         await state.update_data(enter_email=message.text)
-        await message.answer(text=LEXICON_PICTURES['addressee'])
+        await message.answer(text=LEXICON_PICTURES['addressee'], reply_markup=skip())
         await state.set_state(FSM_PICTURE.for_whom)
 
 
@@ -191,72 +197,68 @@ async def contact_sent(message: Message, state: FSMContext):
 
 # Хендлер на вопрос 'Для кого картина'
 @router.message(StateFilter(FSM_PICTURE.for_whom))
-@router.callback_query(F.data == 'skip_question', StateFilter(FSM_PICTURE.for_whom))
-async def for_whom(callback: CallbackQuery, state: FSMContext):
-    if callback.data:
-        await callback.answer()
+@router.message(StateFilter(FSM_PICTURE.for_whom), F.text == LEXICON_PICTURES['skip'])
+async def for_whom(message: Message, state: FSMContext):
+    if message.text == LEXICON_PICTURES['skip']:
         await state.update_data(for_whom='   ---')
     else:
-        await state.update_data(for_whom=callback.message.text)
-    await callback.message.answer(text=LEXICON_PICTURES['event'], reply_markup=skip())
+        await state.update_data(for_whom=message.text)
+    await message.answer(text=LEXICON_PICTURES['event'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.event)
 
 
 # Хендлер на вопрос 'По какому случаю'
-@router.callback_query(StateFilter(FSM_PICTURE.event))
-@router.callback_query(F.data == 'skip_question')
-async def event(callback: CallbackQuery, state: FSMContext):
-    if callback.data == 'skip_question':
-        await callback.answer()
+@router.message(StateFilter(FSM_PICTURE.event))
+@router.message(StateFilter(FSM_PICTURE.event), F.text == LEXICON_PICTURES['skip'])
+async def event(message: Message, state: FSMContext):
+    if message.text == LEXICON_PICTURES['skip']:
         await state.update_data(event='   ---')
     else:
-        await state.update_data(event=callback.message.text)
-    await callback.message.answer(text=LEXICON_PICTURES['size'], reply_markup=skip())
+        await state.update_data(event=message.text)
+    await message.answer(text=LEXICON_PICTURES['size'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.size)
 
 
 # Хендлер на вопрос 'Размер картины'
-@router.callback_query(StateFilter(FSM_PICTURE.size))
-@router.callback_query(F.data == 'skip_question')
-async def size(callback: CallbackQuery, state: FSMContext):
-    if callback.data == 'skip_question':
-        await callback.answer()
+@router.message(StateFilter(FSM_PICTURE.size))
+@router.message(StateFilter(FSM_PICTURE.size), F.text == LEXICON_PICTURES['skip'])
+async def size(message: Message, state: FSMContext):
+    if message.text == LEXICON_PICTURES['skip']:
         await state.update_data(size='   ---')
     else:
-        await state.update_data(size=callback.message.text)
-    await callback.message.answer(text=LEXICON_PICTURES['mood'], reply_markup=skip())
+        await state.update_data(size=message.text)
+    await message.answer(text=LEXICON_PICTURES['mood'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.mood)
 
 
 # Хендлер на вопрос 'Настроение'
-@router.callback_query(StateFilter(FSM_PICTURE.mood))
-@router.callback_query(F.data == 'skip_question')
-async def mood(callback: CallbackQuery, state: FSMContext):
-    if callback.data == 'skip_question':
-        await callback.answer()
+@router.message(StateFilter(FSM_PICTURE.mood))
+@router.message(StateFilter(FSM_PICTURE.mood), F.text == LEXICON_PICTURES['skip'])
+async def mood(message: Message, state: FSMContext):
+    if message.text == LEXICON_PICTURES['skip']:
         await state.update_data(mood='   ---')
     else:
-        await state.update_data(mood=callback.message.text)
-    await callback.message.answer(text=LEXICON_PICTURES['color'], reply_markup=skip())
+        await state.update_data(mood=message.text)
+    await message.answer(text=LEXICON_PICTURES['color'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.color)
 
 
 # Хендлер на вопрос 'Цветовая гамма' - отправка даннных админам
-@router.callback_query(StateFilter(FSM_PICTURE.color))
-@router.callback_query(F.data == 'skip_question')
-async def color(callback: CallbackQuery, state: FSMContext):
-    if callback.data == 'skip_question':
-        await callback.answer()
+@router.message(StateFilter(FSM_PICTURE.color))
+@router.message(StateFilter(FSM_PICTURE.color), F.text == LEXICON_PICTURES['skip'])
+async def color(message: Message, state: FSMContext):
+    await message.answer(text='Благодарю за ответы;)', reply_markup=ReplyKeyboardRemove()) 
+    if message.text == LEXICON_PICTURES['skip']:
         await state.update_data(color='   ---')
     else:
-        await state.update_data(color=callback.message.text) 
-    id = callback.message.from_user.id
+        await state.update_data(color=message.text)
+    id = message.from_user.id
     data = await state.get_data()
     text = creat_text(users_db, id, mode='order', **data)
-    await callback.message.answer(
-            text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
-            reply_markup=send_correct(),
-        )
+    await message.answer(
+        text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
+        reply_markup=send_correct(),
+    )
     await state.clear()
     await state.update_data(text=text)
     await state.set_state(FSM_PICTURE.send_order)
@@ -288,4 +290,3 @@ async def correct_button(callback: CallbackQuery, state: FSMContext):
         await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_order'], reply_markup=method_contact())
         await state.clear()
         await state.set_state(FSM_PICTURE.how_contact_order)
-

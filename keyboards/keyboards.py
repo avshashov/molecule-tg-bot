@@ -137,6 +137,7 @@ def buy_ready() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['catalog_paintings'], url='https://disk.yandex.ru/d/1MSKch2JtaetfA'))
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['contact_me'], callback_data='contact_me'))
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['back'], callback_data='back_pictures'))
     kb.adjust(1)
     return kb.as_markup()
 
@@ -169,7 +170,7 @@ def cancel_picture() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 # Клавиатура - кнопка 'Пропустить вопрос'
-def skip() -> InlineKeyboardMarkup:
-    kb = InlineKeyboardBuilder()
-    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['skip'], callback_data='skip_question'))
-    return kb.as_markup()
+def skip() -> ReplyKeyboardMarkup:
+    kb = ReplyKeyboardBuilder()
+    kb.button(text=LEXICON_PICTURES['skip'])
+    return kb.as_markup(resize_keyboard=True, one_time_keyboard=True)
