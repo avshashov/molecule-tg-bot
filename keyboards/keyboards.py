@@ -167,3 +167,9 @@ def cancel_picture() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['cancel_button'], callback_data='cancel_button_pictures'))
     return kb.as_markup()
+
+# Клавиатура - кнопка 'Пропустить вопрос'
+def skip() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.add(InlineKeyboardButton(text=LEXICON_PICTURES['skip'], callback_data='skip_question'))
+    return kb.as_markup()

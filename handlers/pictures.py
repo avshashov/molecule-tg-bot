@@ -10,7 +10,8 @@ from keyboards.keyboards import (
     send_contact,
     send_correct,
     cancel_picture,
-    menu_kb
+    menu_kb,
+    skip
 )
 from config_data.config import config
 
@@ -180,7 +181,7 @@ async def contact_sent(message: Message, state: FSMContext):
             await state.update_data(text=text)
 
         elif FSM_PICTURE.enter_telephone_order == await state.get_state():
-            await message.answer(text=LEXICON_PICTURES['addressee'])
+            await message.answer(text=LEXICON_PICTURES['addressee'], reply_markup=skip())
             await state.set_state(FSM_PICTURE.for_whom)
     else:
         await message.answer(
@@ -190,44 +191,69 @@ async def contact_sent(message: Message, state: FSMContext):
 
 # Хендлер на вопрос 'Для кого картина'
 @router.message(StateFilter(FSM_PICTURE.for_whom))
-async def for_whom(message: Message, state: FSMContext):
-    await state.update_data(for_whom=message.text)
-    await message.answer(text=LEXICON_PICTURES['event'])
+@router.callback_query(F.data == 'skip_question', StateFilter(FSM_PICTURE.for_whom))
+async def for_whom(callback: CallbackQuery, state: FSMContext):
+    if callback.data:
+        await callback.answer()
+        await state.update_data(for_whom='   ---')
+    else:
+        await state.update_data(for_whom=callback.message.text)
+    await callback.message.answer(text=LEXICON_PICTURES['event'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.event)
 
 
 # Хендлер на вопрос 'По какому случаю'
-@router.message(StateFilter(FSM_PICTURE.event))
-async def event(message: Message, state: FSMContext):
-    await state.update_data(event=message.text)
-    await message.answer(text=LEXICON_PICTURES['size'])
+@router.callback_query(StateFilter(FSM_PICTURE.event))
+@router.callback_query(F.data == 'skip_question')
+async def event(callback: CallbackQuery, state: FSMContext):
+    if callback.data == 'skip_question':
+        await callback.answer()
+        await state.update_data(event='   ---')
+    else:
+        await state.update_data(event=callback.message.text)
+    await callback.message.answer(text=LEXICON_PICTURES['size'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.size)
 
 
 # Хендлер на вопрос 'Размер картины'
-@router.message(StateFilter(FSM_PICTURE.size))
-async def size(message: Message, state: FSMContext):
-    await state.update_data(size=message.text)
-    await message.answer(text=LEXICON_PICTURES['mood'])
+@router.callback_query(StateFilter(FSM_PICTURE.size))
+@router.callback_query(F.data == 'skip_question')
+async def size(callback: CallbackQuery, state: FSMContext):
+    if callback.data == 'skip_question':
+        await callback.answer()
+        await state.update_data(size='   ---')
+    else:
+        await state.update_data(size=callback.message.text)
+    await callback.message.answer(text=LEXICON_PICTURES['mood'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.mood)
 
 
 # Хендлер на вопрос 'Настроение'
-@router.message(StateFilter(FSM_PICTURE.mood))
-async def mood(message: Message, state: FSMContext):
-    await state.update_data(mood=message.text)
-    await message.answer(text=LEXICON_PICTURES['color'])
+@router.callback_query(StateFilter(FSM_PICTURE.mood))
+@router.callback_query(F.data == 'skip_question')
+async def mood(callback: CallbackQuery, state: FSMContext):
+    if callback.data == 'skip_question':
+        await callback.answer()
+        await state.update_data(mood='   ---')
+    else:
+        await state.update_data(mood=callback.message.text)
+    await callback.message.answer(text=LEXICON_PICTURES['color'], reply_markup=skip())
     await state.set_state(FSM_PICTURE.color)
 
 
 # Хендлер на вопрос 'Цветовая гамма' - отправка даннных админам
-@router.message(StateFilter(FSM_PICTURE.color))
-async def color(message: Message, state: FSMContext):
-    await state.update_data(color=message.text) 
-    id = message.from_user.id
+@router.callback_query(StateFilter(FSM_PICTURE.color))
+@router.callback_query(F.data == 'skip_question')
+async def color(callback: CallbackQuery, state: FSMContext):
+    if callback.data == 'skip_question':
+        await callback.answer()
+        await state.update_data(color='   ---')
+    else:
+        await state.update_data(color=callback.message.text) 
+    id = callback.message.from_user.id
     data = await state.get_data()
     text = creat_text(users_db, id, mode='order', **data)
-    await message.answer(
+    await callback.message.answer(
             text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
             reply_markup=send_correct(),
         )
@@ -262,3 +288,4 @@ async def correct_button(callback: CallbackQuery, state: FSMContext):
         await callback.message.edit_text(text=LEXICON_PICTURES['how_contact_order'], reply_markup=method_contact())
         await state.clear()
         await state.set_state(FSM_PICTURE.how_contact_order)
+
