@@ -13,7 +13,7 @@ from keyboards.keyboards import (
     menu_kb,
     skip
 )
-from keyboards.functions import creat_text
+from functions.text_creator import create_text
 from config_data.config import config
 
 from aiogram.fsm.context import FSMContext
@@ -115,7 +115,7 @@ async def email_process(message: Message, state: FSMContext):
         await state.update_data(enter_email=message.text)
         id = message.from_user.id
         data = await state.get_data()
-        text = creat_text(users_db, id, mode='ready', **data)
+        text = create_text(users_db, id, mode='ready', **data)
         await message.answer(
             text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
             reply_markup=send_correct())
@@ -143,7 +143,7 @@ async def contact_sent(message: Message, state: FSMContext):
             # формирование сообшения - отправка данных админам
             id = message.from_user.id
             data = await state.get_data()
-            text = creat_text(users_db, id, mode=PictureStatus.READY, **data)
+            text = create_text(users_db, id, mode=PictureStatus.READY, **data)
             await message.answer(
                 text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
                 reply_markup=send_correct())
@@ -209,7 +209,7 @@ async def color(message: Message, state: FSMContext):
         await state.update_data(color=message.text)
     id = message.from_user.id
     data = await state.get_data()
-    text = creat_text(users_db, id, mode=PictureStatus.ORDER, **data)
+    text = create_text(users_db, id, mode=PictureStatus.ORDER, **data)
     await message.answer(
         text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
         reply_markup=send_correct(),

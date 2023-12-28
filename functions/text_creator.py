@@ -1,7 +1,7 @@
 from constants import PictureStatus
 
 # функция формирования сообшения
-def creat_text(users_db, user_id, mode: str, **kwargs) -> str:
+def create_text(users_db, user_id, mode: str, **kwargs) -> str:
     text_name = f'Имя: {users_db[user_id]["name"]}\n' 
     text_contact = f'Телефон: {kwargs.get("enter_telephone", "-")}\n' \
                    f'Способ связи: {kwargs.get("how_contact", "-")}\n'
