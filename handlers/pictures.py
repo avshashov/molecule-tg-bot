@@ -20,6 +20,7 @@ from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_PICTURE
 from aiogram.fsm.state import default_state
 
+from constants import PictureStatus
 
 router = Router()
 
@@ -142,7 +143,7 @@ async def contact_sent(message: Message, state: FSMContext):
             # формирование сообшения - отправка данных админам
             id = message.from_user.id
             data = await state.get_data()
-            text = creat_text(users_db, id, mode='ready', **data)
+            text = creat_text(users_db, id, mode=PictureStatus.READY, **data)
             await message.answer(
                 text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
                 reply_markup=send_correct())
@@ -203,12 +204,12 @@ async def mood(message: Message, state: FSMContext):
 @router.message(StateFilter(FSM_PICTURE.color))
 @router.message(StateFilter(FSM_PICTURE.color), F.text == LEXICON_PICTURES['skip'])
 async def color(message: Message, state: FSMContext):
-    await message.answer(text='Благодарю за ответы;)', reply_markup=ReplyKeyboardRemove()) 
+    await message.answer(text='Благодарю за ответы ☑️', reply_markup=ReplyKeyboardRemove()) 
     if message.text != LEXICON_PICTURES['skip']:
         await state.update_data(color=message.text)
     id = message.from_user.id
     data = await state.get_data()
-    text = creat_text(users_db, id, mode='order', **data)
+    text = creat_text(users_db, id, mode=PictureStatus.ORDER, **data)
     await message.answer(
         text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
         reply_markup=send_correct(),
