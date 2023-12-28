@@ -179,6 +179,6 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     # Отправка пользователю данных заявки
     await callback.message.answer(text=f'{data["text"]}')
     # Отправка заявки в чат с админами
-    await bot.send_message(chat_id=config.tg_bot.admin_ids[0], text=f'{data["text"]}')
+    await bot.send_message(chat_id=config.tg_bot.admin_id, text=f'{data["text"]}')
     await callback.answer()
     await state.clear()
