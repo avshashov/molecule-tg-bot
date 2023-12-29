@@ -3,7 +3,7 @@ from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
 from database.database import presentation_id, preza
-from keyboards.keyboards import about_project
+from keyboards.about_project_kb import about_project
 
 router = Router()
 

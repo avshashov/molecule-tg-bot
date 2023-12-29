@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
 from database.database import photo_room, users_db
-from keyboards.keyboards import (
+from keyboards.rent_kb import (
     rent,
     communication_method,
     how_room,

@@ -3,17 +3,18 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_PICTURES, LEXICON_RENT
 from database.database import users_db
-from keyboards.keyboards import (
+from keyboards.pictures_kb import (
     pictures,
     buy_ready,
     method_contact,
-    send_contact,
     send_correct,
     cancel_picture,
-    menu_kb,
     skip
 )
-from functions.text_creator import create_text
+from keyboards.rent_kb import send_contact
+from keyboards.menu_kb import menu_kb
+
+from text_creator import create_text
 from config_data.config import config
 
 from aiogram.fsm.context import FSMContext

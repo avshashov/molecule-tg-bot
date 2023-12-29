@@ -1,12 +1,13 @@
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
 
 from database.database import users_db
-from keyboards.keyboards import yes_no_kb, menu_kb
+from keyboards.menu_kb import menu_kb
+from keyboards.user_name_setting import yes_no_kb
 from lexicon.lexicon_ru import LEXICON_SET_USER_NAME, LEXICON_MENU_BUTTONS
 
-from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_SET_NAME
 
 
