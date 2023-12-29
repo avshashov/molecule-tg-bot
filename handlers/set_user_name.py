@@ -3,7 +3,8 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery
 from lexicon.lexicon_ru import LEXICON_SET_USER_NAME, LEXICON_MENU_BUTTONS
 from database.database import users_db
-from keyboards.keyboards import menu_kb, yes_no_name_kb
+from keyboards.menu_kb import menu_kb
+from keyboards.user_name_setting import yes_no_name_kb
 
 from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_SET_NAME
@@ -16,7 +17,7 @@ router = Router()
 @router.callback_query(F.data == 'of_course')
 async def of_course_answer(callback: CallbackQuery):
     users_db[callback.from_user.id] = {'name': callback.from_user.full_name}
-    await callback.message.edit_text(text='Отлично)\n\n')
+    await callback.message.edit_text(text='Отлично 👍\n\n')
     await callback.message.answer(text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb())
     await callback.answer()
 
@@ -45,7 +46,7 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
     users_db[callback.from_user.id] = await state.get_data()
     await state.clear()
     await callback.message.answer(
-        text=f'Приветствую тебя, {users_db[callback.from_user.id]["name"]}!\n\n'
+        text=f'Приветствую тебя 🤝, {users_db[callback.from_user.id]["name"]}!\n\n'
              f'{LEXICON_MENU_BUTTONS["text_menu"]}',
              reply_markup=menu_kb()
     )

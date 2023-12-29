@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
 from database.database import photo_room, users_db
-from keyboards.keyboards import (
+from keyboards.rent_kb import (
     rent,
     communication_method,
     how_room,
@@ -12,6 +12,8 @@ from keyboards.keyboards import (
     cancel_rent,
     send_contact,
 )
+from text_creator import TextCreator
+from constants import PictureStatus
 from config_data.config import config
 
 from aiogram.fsm.context import FSMContext
@@ -32,8 +34,9 @@ router = Router()
 @router.message(F.text == LEXICON_MENU_BUTTONS['rent'])
 async def rent_button(message: Message):
     await message.answer(text=LEXICON_RENT['rent'])
-    await message.answer_media_group(media=photo_room)
-    await message.answer(text='Оставляй заявку, если заинтересовало 👇', reply_markup=rent())
+    if photo_room:
+        await message.answer_media_group(media=photo_room)
+    await message.answer(text='Оставляй заявку прямо здесь 👇', reply_markup=rent())
 
 
 # Хендлер на кнопку "cancel"
@@ -41,11 +44,12 @@ async def rent_button(message: Message):
 async def cancel_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_RENT['cancel'], reply_markup=rental_request())
     await state.clear()
+    await callback.answer()
 
 
 # Хендлер на кнопку 'Оставить заявку на аренду помещения' и кнопку 'Исправить'
 # Устанавливает состояние ввода телефона
-@router.callback_query(F.data == 'repeat_request')
+@router.callback_query(F.data == 'repeat_request', StateFilter(FSM_RENT.send_rent))
 @router.callback_query(F.data == 'rental_request')
 async def rental_request_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
@@ -59,8 +63,8 @@ async def rental_request_button(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.enter_telephone))
 @router.message(F.contact, StateFilter(FSM_RENT.enter_telephone))
 async def telephone_sent(message: Message, state: FSMContext):
-    await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
     if (message.text and message.text.isdigit()) or message.contact:
+        await message.answer(text='👍', reply_markup=ReplyKeyboardRemove())
         if message.text:
             await state.update_data(enter_telephone=message.text)
         elif message.contact:
@@ -81,7 +85,7 @@ async def how_contact_press(callback: CallbackQuery, state: FSMContext):
     await state.update_data(how_contact=LEXICON_RENT[callback.data])
     await callback.message.delete()  # Удалить сообщение с кнопками
     await callback.message.answer(
-        text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["date"]}'
+        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["date"]}'
     )
     await callback.answer()
     await state.set_state(FSM_RENT.date)
@@ -142,19 +146,14 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
     # Формирование сообщения заявки
-    text = f'''Имя: {users_db[id]["name"]}\n
-Телефон: {data["enter_telephone"]}\n
-Способ связи: {data["how_contact"]}\n
-Дата: {data["date"]}\n
-Мероприятие: {data["event"]}\n
-Сколько человек: {data["how_people"]}\n
-Залов требуется: {data["how_room"]}'''
+    text = TextCreator.create_text_rent(users_db, id, mode=PictureStatus.RENT, **data)
 
     await callback.message.answer(
-        text=f'Вы выбрали - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["finish"]}\n\n' f'{text}',
+        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["finish"]}\n\n' f'{text}',
         reply_markup=send(),
     )
     await callback.answer()
+    await state.set_state(FSM_RENT.send_rent)
     await state.update_data(text=text)
 
 
@@ -168,7 +167,7 @@ async def warning_not_room(message: Message):
 
 
 # Хендлер на кнопку 'Отправить'
-@router.callback_query(F.data == 'send')
+@router.callback_query(StateFilter(FSM_RENT.send_rent), F.data == 'send')
 async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.message.delete()
     data = await state.get_data()
@@ -176,6 +175,6 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     # Отправка пользователю данных заявки
     await callback.message.answer(text=f'{data["text"]}')
     # Отправка заявки в чат с админами
-    await bot.send_message(chat_id=config.tg_bot.admin_ids[0], text=f'{data["text"]}')
+    await bot.send_message(chat_id=config.tg_bot.admin_id, text=f'{data["text"]}')
     await callback.answer()
     await state.clear()

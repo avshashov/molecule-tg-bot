@@ -1,12 +1,13 @@
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
 
 from database.database import users_db
-from keyboards.keyboards import yes_no_kb, menu_kb
+from keyboards.menu_kb import menu_kb
+from keyboards.user_name_setting import yes_no_kb
 from lexicon.lexicon_ru import LEXICON_SET_USER_NAME, LEXICON_MENU_BUTTONS
 
-from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_SET_NAME
 
 
@@ -18,16 +19,17 @@ router = Router()
 # и отправлять ему приветственное сообщение
 @router.message(CommandStart())
 async def start_command(message: Message, state: FSMContext):
+    await state.clear()
     if message.from_user.id in users_db:  # Если пользователь уже в базе
         await message.answer(
-            text=f'Приветствую тебя, {users_db[message.from_user.id]["name"]}, я Небула - бот Молекулы\n\n'
+            text=f'Приветствую тебя 🤝, {users_db[message.from_user.id]["name"]}, я Небула🌀 - бот Молекулы©️\n\n'
             f'{LEXICON_MENU_BUTTONS["text_menu"]}',
             reply_markup=menu_kb()
         )
 
     elif message.from_user.full_name:  # Если указан фулл нейм
         await message.answer(
-            text=f'Приветствую тебя, {message.from_user.full_name}, я Небула - бот Молекулы\n\n'
+            text=f'Приветствую тебя 🤝, {message.from_user.full_name}, я Небула🌀 - бот Молекулы©️\n\n'
             'Могу ли я к тебе так обращаться?',
             reply_markup=yes_no_kb()
         )

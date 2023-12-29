@@ -13,7 +13,6 @@ preza = {
     "file_unique_id": "AgADN0MAAkSpaEs",
 }
 
-
 ids_photo_room = [
     'AgACAgIAAxkBAAIFXGV5WzWSM0w3z2U_JS04MIbEbAqkAAIC1DEbc5vRSwKSB3ZHkHHnAQADAgADeAADMwQ',
     'AgACAgIAAxkBAAIFXWV5W0dZ4hl14KLej1pmGZw_AAFHFgACA9QxG3Ob0UvfJ6tSAsBDJQEAAwIAA3gAAzME',
@@ -23,5 +22,5 @@ ids_photo_room = [
     'AgACAgIAAxkBAAIFYWV5W14GL_5sEzngEdmZ3kWrqF0kAAII1DEbc5vRS3HGXfv6xIPeAQADAgADeAADMwQ',
     'AgACAgIAAxkBAAIFYmV5W2NwI7wHlYXLG4GCojtyqlCJAAIJ1DEbc5vRS-fNt42_9O2vAQADAgADeAADMwQ',
 ]
-
-photo_room = [InputMediaPhoto(media=id) for id in ids_photo_room]
+if ids_photo_room:
+    photo_room = [InputMediaPhoto(media=id) for id in ids_photo_room]
