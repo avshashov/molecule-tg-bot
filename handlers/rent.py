@@ -34,7 +34,8 @@ router = Router()
 @router.message(F.text == LEXICON_MENU_BUTTONS['rent'])
 async def rent_button(message: Message):
     await message.answer(text=LEXICON_RENT['rent'])
-    await message.answer_media_group(media=photo_room)
+    if photo_room:
+        await message.answer_media_group(media=photo_room)
     await message.answer(text='Оставляй заявку прямо здесь 👇', reply_markup=rent())
 
 

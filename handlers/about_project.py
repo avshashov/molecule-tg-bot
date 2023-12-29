@@ -5,6 +5,7 @@ from lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
 from database.database import presentation_id, preza
 from keyboards.about_project_kb import about_project
 
+
 router = Router()
 
 
@@ -27,5 +28,8 @@ async def projects_button(message: Message):
 # Хендлер на кнопку 'Скачать PDF презентацию'
 @router.callback_query(F.data == 'download_presentation')
 async def download_presentation(callback: CallbackQuery, bot: Bot):
-    await bot.send_document(chat_id=callback.from_user.id, document=preza['file_id'])
+    if 'file_id' in preza:
+        await bot.send_document(chat_id=callback.from_user.id, document=preza['file_id'])
+    else:
+        await callback.message.answer(text='Извини, презентация пока не готова')
     await callback.answer()
