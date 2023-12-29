@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from lexicon.lexicon_ru import (
+from app.lexicon.lexicon_ru import (
     LEXICON_MENU_BUTTONS,   
 )
 

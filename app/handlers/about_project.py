@@ -1,9 +1,9 @@
 from aiogram import Bot
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
-from lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
-from database.database import presentation_id, preza
-from keyboards.about_project_kb import about_project
+from app.lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
+from app.database.database import preza
+from app.keyboards.about_project_kb import about_project
 
 
 router = Router()

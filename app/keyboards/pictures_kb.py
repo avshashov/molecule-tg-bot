@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from lexicon.lexicon_ru import (
+from app.lexicon.lexicon_ru import (
     LEXICON_MENU_BUTTONS,
     LEXICON_RENT,
     LEXICON_PICTURES

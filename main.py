@@ -2,11 +2,11 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from config_data.config import config
-from handlers import menu_handlers, set_user_name, about_project, rent, pictures
+from app.config import config
+from app.handlers import rent, about_project, menu_handlers, pictures, set_user_name
 
 from aiogram.types import BotCommand
-from lexicon.lexicon_ru import LEXICON_SET_MENU
+from app.lexicon.lexicon_ru import LEXICON_SET_MENU
 
 from aiogram.fsm.storage.memory import MemoryStorage
 

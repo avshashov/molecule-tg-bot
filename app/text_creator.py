@@ -1,4 +1,4 @@
-from constants import PictureStatus
+from app.constants import PictureStatus
 
 # формирование сообшений
 class TextCreator:

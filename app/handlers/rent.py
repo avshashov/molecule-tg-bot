@@ -1,9 +1,9 @@
 from aiogram import F, Router, Bot
 from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
-from database.database import photo_room, users_db
-from keyboards.rent_kb import (
+from app.lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
+from app.database.database import photo_room, users_db
+from app.keyboards.rent_kb import (
     rent,
     communication_method,
     how_room,
@@ -12,12 +12,12 @@ from keyboards.rent_kb import (
     cancel_rent,
     send_contact,
 )
-from text_creator import TextCreator
-from constants import PictureStatus
-from config_data.config import config
+from app.text_creator import TextCreator
+from app.constants import PictureStatus
+from app.config import config
 
 from aiogram.fsm.context import FSMContext
-from fsm.fsm import FSM_RENT
+from app.fsm.fsm import FSM_RENT
 from aiogram.fsm.state import default_state
 
 
