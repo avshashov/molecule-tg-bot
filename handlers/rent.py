@@ -12,6 +12,8 @@ from keyboards.rent_kb import (
     cancel_rent,
     send_contact,
 )
+from text_creator import TextCreator
+from constants import PictureStatus
 from config_data.config import config
 
 from aiogram.fsm.context import FSMContext
@@ -143,14 +145,7 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
     # Формирование сообщения заявки
-    text = f'''Заказ: Аренда помещения\n
-Имя: {users_db[id]["name"]}\n
-Телефон: {data["enter_telephone"]}\n
-Способ связи: {data["how_contact"]}\n
-Дата: {data["date"]}\n
-Мероприятие: {data["event"]}\n
-Сколько человек: {data["how_people"]}\n
-Залов требуется: {data["how_room"]}'''
+    text = TextCreator.create_text_rent(users_db, id, mode=PictureStatus.RENT, **data)
 
     await callback.message.answer(
         text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["finish"]}\n\n' f'{text}',

@@ -14,14 +14,14 @@ from keyboards.pictures_kb import (
 from keyboards.rent_kb import send_contact
 from keyboards.menu_kb import menu_kb
 
-from text_creator import CREATE_TEXT
+from constants import PictureStatus
+from text_creator import TextCreator
 from config_data.config import config
 
 from aiogram.fsm.context import FSMContext
 from fsm.fsm import FSM_PICTURE
 from aiogram.fsm.state import default_state
 
-from constants import PictureStatus
 
 router = Router()
 
@@ -116,7 +116,7 @@ async def email_process(message: Message, state: FSMContext):
         await state.update_data(enter_email=message.text)
         id = message.from_user.id
         data = await state.get_data()
-        text = CREATE_TEXT.create_text_ready(users_db, id, mode='ready', **data)
+        text = TextCreator.create_text_ready(users_db, id, mode='ready', **data)
         await message.answer(
             text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
             reply_markup=send_correct())
@@ -144,7 +144,7 @@ async def contact_sent(message: Message, state: FSMContext):
             # формирование сообшения - отправка данных админам
             id = message.from_user.id
             data = await state.get_data()
-            text = CREATE_TEXT.create_text_ready(users_db, id, mode=PictureStatus.READY, **data)
+            text = TextCreator.create_text_ready(users_db, id, mode=PictureStatus.READY, **data)
             await message.answer(
                 text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
                 reply_markup=send_correct())
@@ -210,7 +210,7 @@ async def color(message: Message, state: FSMContext):
         await state.update_data(color=message.text)
     id = message.from_user.id
     data = await state.get_data()
-    text = CREATE_TEXT.create_text_order(users_db, id, mode=PictureStatus.ORDER, **data)
+    text = TextCreator.create_text_order(users_db, id, mode=PictureStatus.ORDER, **data)
     await message.answer(
         text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
         reply_markup=send_correct(),

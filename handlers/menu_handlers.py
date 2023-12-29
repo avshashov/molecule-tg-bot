@@ -22,14 +22,14 @@ async def start_command(message: Message, state: FSMContext):
     await state.clear()
     if message.from_user.id in users_db:  # Если пользователь уже в базе
         await message.answer(
-            text=f'Приветствую тебя, {users_db[message.from_user.id]["name"]}, я Небула - бот Молекулы\n\n'
+            text=f'Приветствую тебя 🤝, {users_db[message.from_user.id]["name"]}, я Небула🌀 - бот Молекулы©️\n\n'
             f'{LEXICON_MENU_BUTTONS["text_menu"]}',
             reply_markup=menu_kb()
         )
 
     elif message.from_user.full_name:  # Если указан фулл нейм
         await message.answer(
-            text=f'Приветствую тебя, {message.from_user.full_name}, я Небула - бот Молекулы\n\n'
+            text=f'Приветствую тебя 🤝, {message.from_user.full_name}, я Небула🌀 - бот Молекулы©️\n\n'
             'Могу ли я к тебе так обращаться?',
             reply_markup=yes_no_kb()
         )

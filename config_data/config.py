@@ -11,7 +11,7 @@ class DatabaseConfig:
 @dataclass
 class TgBot:
     token: str            # Токен для доступа к телеграм-боту
-    admin_id: int  # Список id администраторов бота
+    admin_id: int         # id администратора бота
 
 @dataclass
 class Config:
