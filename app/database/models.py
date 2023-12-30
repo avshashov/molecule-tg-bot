@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import BigInteger, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
@@ -25,6 +25,21 @@ class Media(Base):
     media_name: Mapped[str] = mapped_column(String(length=15), nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
+
+    media_type: Mapped['MediaType'] = relationship('MediaType', backref='media')
+    media_block: Mapped['MediaBlock'] = relationship('MediaBlock', backref='media')
+
+
+class MediaType(Base):
+    __tablename__ = 'media_type'
+
+    type: Mapped[str]
+
+
+class MediaBlock(Base):
+    __tablename__ = 'media_block'
+
+    block: Mapped[str]
 
 
 class Picture(Base):
