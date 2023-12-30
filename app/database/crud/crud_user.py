@@ -8,7 +8,7 @@ from app.database.models import User
 
 class CRUDUser:
     @staticmethod
-    async def create_user(session: AsyncSession, user_fields: schemas.User) -> None:
+    async def create_user(session: AsyncSession, user_fields: schemas.UserCreate) -> None:
         """
         Метод создания пользователя в таблице User.
 
