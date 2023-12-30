@@ -45,7 +45,7 @@ def load_config(path: str | None = None) -> Config:
             password=env('password'),
             driver=env('driver'),
             port=env('port'),
-            echo_db=env('echo_db'),
+            echo_db=env.bool('echo_db'),
         ),
     )
 
