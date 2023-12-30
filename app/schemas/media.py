@@ -10,7 +10,8 @@ class MediaBase(BaseModel):
 
 
 class MediaCreate(MediaBase):
-    pass
+    media_type_id: int
+    media_block_id: int
 
 
 class Media(MediaBase):
@@ -21,4 +22,3 @@ class MediaUpdate(BaseModel):
     media_id: str | None = None
     description: str | None = None
     media_name: str | None = None
-
