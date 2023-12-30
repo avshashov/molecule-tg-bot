@@ -1,5 +1,4 @@
 from sqlalchemy import select
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
@@ -8,7 +7,9 @@ from app.database.models import User
 
 class CRUDUser:
     @staticmethod
-    async def create_user(session: AsyncSession, user_fields: schemas.UserCreate) -> None:
+    async def create_user(
+        session: AsyncSession, user_fields: schemas.UserCreate
+    ) -> None:
         """
         Метод создания пользователя в таблице User.
 
@@ -28,7 +29,7 @@ class CRUDUser:
         :param tg_user_id: Телеграм ID.
         :return: Сущность пользователя.
         """
-        query = (select(User).where(User.id == tg_user_id))
+        query = select(User).where(User.id == tg_user_id)
         stmt = await session.execute(query)
         return stmt.scalar()
 
@@ -52,6 +53,6 @@ class CRUDUser:
         :param tg_user_id: Телеграм ID.
         :return: True/False
         """
-        query = (select(User).where(User.id == tg_user_id))
+        query = select(User).where(User.id == tg_user_id)
         stmt = await session.execute(query)
         return bool(stmt)

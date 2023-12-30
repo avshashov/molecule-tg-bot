@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from environs import Env
 
 
@@ -29,15 +30,13 @@ class Config:
 # Функция, которая будет читать файл .env и возвращать
 # экземпляр класса Config
 
+
 def load_config(path: str | None = None) -> Config:
     env = Env()
     env.read_env(path)
 
     return Config(
-        tg_bot=TgBot(
-            token=env('BOT_TOKEN'),
-            admin_id=env('ADMIN_IDS')
-        ),
+        tg_bot=TgBot(token=env('BOT_TOKEN'), admin_id=env('ADMIN_IDS')),
         db=DatabaseConfig(
             dbms=env('dbms'),
             database=env('database'),
@@ -46,7 +45,8 @@ def load_config(path: str | None = None) -> Config:
             password=env('password'),
             driver=env('driver'),
             port=env('port'),
-            echo_db=env('echo_db'))
+            echo_db=env('echo_db'),
+        ),
     )
 
 

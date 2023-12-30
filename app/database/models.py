@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, String, ForeignKey
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -25,8 +25,12 @@ class Media(Base):
     media_name: Mapped[str] = mapped_column(String(length=15), nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
-    media_type_id: Mapped[int] = mapped_column(ForeignKey('media_type.id', ondelete='CASCADE'))
-    media_block_id: Mapped[int] = mapped_column(ForeignKey('media_block.id', ondelete='CASCADE'))
+    media_type_id: Mapped[int] = mapped_column(
+        ForeignKey('media_type.id', ondelete='CASCADE')
+    )
+    media_block_id: Mapped[int] = mapped_column(
+        ForeignKey('media_block.id', ondelete='CASCADE')
+    )
 
     media_type: Mapped['MediaType'] = relationship('MediaType', backref='media')
     media_block: Mapped['MediaBlock'] = relationship('MediaBlock', backref='media')
