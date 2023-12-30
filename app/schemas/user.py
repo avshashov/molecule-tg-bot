@@ -13,10 +13,10 @@ class UserCreate(UserBase):
     pass
 
 
-class User(BaseModel):
+class User(UserBase):
     created_at: datetime
     is_active: bool
 
 
-class UserUpdate(UserBase):
+class UserUpdate(BaseModel):
     is_active: bool
