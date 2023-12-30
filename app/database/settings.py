@@ -4,11 +4,18 @@ from app.config import config
 
 
 class BotDB:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
     def __init__(self):
         self._settings_db = config.db
         self._url = self._build_url()
         self.engine = create_async_engine(url=self._url, echo=self._settings_db.echo_db)
-        self.async_session = async_sessionmaker(
+        self.async_session_maker = async_sessionmaker(
             bind=self.engine, autoflush=False, expire_on_commit=False
         )
 
@@ -32,3 +39,6 @@ class BotDB:
     @property
     def url(self):
         return self._url
+
+
+bot_db = BotDB()
