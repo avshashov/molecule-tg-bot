@@ -2,20 +2,29 @@ from aiogram import F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.database import users_db
 from app.fsm.fsm import FSM_SET_NAME
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_name_kb
 from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_SET_USER_NAME
+from app.database.crud import CRUDUser
+from app.schemas import UserCreate
+
 
 router = Router()
 
 
 # Хендлер на кнопку "ДА" заносит пользователя в базу данных и выводит главное меню
 @router.callback_query(F.data == 'of_course')
-async def of_course_answer(callback: CallbackQuery):
-    users_db[callback.from_user.id] = {'name': callback.from_user.full_name}
+async def of_course_answer(callback: CallbackQuery, session: AsyncSession):
+    user = UserCreate(
+        username=callback.from_user.username, 
+        user_id=callback.from_user.id, 
+        full_name=callback.from_user.full_name,
+        )
+    await CRUDUser.create_user(session, user)
     await callback.message.edit_text(text='Отлично 👍\n\n')
     await callback.message.answer(
         text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb()
@@ -42,12 +51,18 @@ async def name_sent(message: Message, state: FSMContext):
 
 # Хендлер на кнопку ДА (подтверддение имени) - заносит имя в базу, приветствует, предлагает меню
 @router.callback_query(F.data == 'confirm', StateFilter(FSM_SET_NAME.enter_name))
-async def confirm(callback: CallbackQuery, state: FSMContext):
+async def confirm(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     # заносим имя в базу из хранилища
-    users_db[callback.from_user.id] = await state.get_data()
+    full_name = (await state.get_data()).get('name')
+    user = UserCreate(
+        username=callback.from_user.username, 
+        user_id=callback.from_user.id, 
+        full_name=full_name,
+        )
+    await CRUDUser.create_user(session, user)
     await state.clear()
     await callback.message.answer(
-        text=f'Приветствую тебя 🤝, {users_db[callback.from_user.id]["name"]}!\n\n'
+        text=f'Приветствую тебя 🤝, {full_name}!\n\n'
         f'{LEXICON_MENU_BUTTONS["text_menu"]}',
         reply_markup=menu_kb(),
     )

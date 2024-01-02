@@ -2,12 +2,16 @@ from aiogram import F, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.database import users_db
 from app.fsm.fsm import FSM_SET_NAME
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_kb
 from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_SET_USER_NAME
+
+from app.database.crud import CRUDUser
+
 
 router = Router()
 
@@ -16,11 +20,11 @@ router = Router()
 # добавлять пользователя в базу данных, если его там еще не было
 # и отправлять ему приветственное сообщение
 @router.message(CommandStart())
-async def start_command(message: Message, state: FSMContext):
+async def start_command(message: Message, state: FSMContext, session: AsyncSession):
     await state.clear()
-    if message.from_user.id in users_db:  # Если пользователь уже в базе
+    if full_name:= await CRUDUser.get_user_full_name(session, message.from_user.id):
         await message.answer(
-            text=f'Приветствую тебя 🤝, {users_db[message.from_user.id]["name"]}, я Небула🌀 - бот Молекулы©️\n\n'
+            text=f'Приветствую тебя 🤝, {full_name}, я Небула🌀 - бот Молекулы©️\n\n'
             f'{LEXICON_MENU_BUTTONS["text_menu"]}',
             reply_markup=menu_kb(),
         )
