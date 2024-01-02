@@ -1,14 +1,13 @@
 from aiogram import F, Router
 from aiogram.filters import StateFilter
-from aiogram.types import Message, CallbackQuery
-from lexicon.lexicon_ru import LEXICON_SET_USER_NAME, LEXICON_MENU_BUTTONS
-from database.database import users_db
-from keyboards.menu_kb import menu_kb
-from keyboards.user_name_setting import yes_no_name_kb
-
 from aiogram.fsm.context import FSMContext
-from fsm.fsm import FSM_SET_NAME
+from aiogram.types import CallbackQuery, Message
 
+from app.database.database import users_db
+from app.fsm.fsm import FSM_SET_NAME
+from app.keyboards.menu_kb import menu_kb
+from app.keyboards.user_name_setting import yes_no_name_kb
+from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_SET_USER_NAME
 
 router = Router()
 
@@ -18,7 +17,9 @@ router = Router()
 async def of_course_answer(callback: CallbackQuery):
     users_db[callback.from_user.id] = {'name': callback.from_user.full_name}
     await callback.message.edit_text(text='Отлично 👍\n\n')
-    await callback.message.answer(text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb())
+    await callback.message.answer(
+        text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb()
+    )
     await callback.answer()
 
 
@@ -36,7 +37,9 @@ async def replace_name(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_SET_NAME.enter_name))
 async def name_sent(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
-    await message.answer(text=f'Оставим имя "{message.text}" ?', reply_markup=yes_no_name_kb())
+    await message.answer(
+        text=f'Оставим имя "{message.text}" ?', reply_markup=yes_no_name_kb()
+    )
 
 
 # Хендлер на кнопку ДА (подтверддение имени) - заносит имя в базу, приветствует, предлагает меню
@@ -47,7 +50,7 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.answer(
         text=f'Приветствую тебя 🤝, {users_db[callback.from_user.id]["name"]}!\n\n'
-             f'{LEXICON_MENU_BUTTONS["text_menu"]}',
-             reply_markup=menu_kb()
+        f'{LEXICON_MENU_BUTTONS["text_menu"]}',
+        reply_markup=menu_kb(),
     )
     await callback.answer()

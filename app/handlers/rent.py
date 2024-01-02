@@ -1,25 +1,24 @@
-from aiogram import F, Router, Bot
+from aiogram import Bot, F, Router
 from aiogram.filters import StateFilter
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from lexicon.lexicon_ru import LEXICON_RENT, LEXICON_MENU_BUTTONS
-from database.database import photo_room, users_db
-from keyboards.rent_kb import (
-    rent,
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import default_state
+from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
+
+from app.config import config
+from app.constants import PictureStatus
+from app.database.database import photo_room, users_db
+from app.fsm.fsm import FSM_RENT
+from app.keyboards.rent_kb import (
+    cancel_rent,
     communication_method,
     how_room,
-    send,
+    rent,
     rental_request,
-    cancel_rent,
+    send,
     send_contact,
 )
-from text_creator import TextCreator
-from constants import PictureStatus
-from config_data.config import config
-
-from aiogram.fsm.context import FSMContext
-from fsm.fsm import FSM_RENT
-from aiogram.fsm.state import default_state
-
+from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_RENT
+from app.text_creator import TextCreator
 
 router = Router()
 
@@ -42,7 +41,9 @@ async def rent_button(message: Message):
 # Хендлер на кнопку "cancel"
 @router.callback_query(F.data == 'cancel_button', ~StateFilter(default_state))
 async def cancel_button(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(text=LEXICON_RENT['cancel'], reply_markup=rental_request())
+    await callback.message.edit_text(
+        text=LEXICON_RENT['cancel'], reply_markup=rental_request()
+    )
     await state.clear()
     await callback.answer()
 
@@ -53,7 +54,9 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == 'rental_request')
 async def rental_request_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer(text=LEXICON_RENT['telephone'], reply_markup=send_contact())
+    await callback.message.answer(
+        text=LEXICON_RENT['telephone'], reply_markup=send_contact()
+    )
     await callback.answer()
     await state.set_state(FSM_RENT.enter_telephone)
 
@@ -69,7 +72,9 @@ async def telephone_sent(message: Message, state: FSMContext):
             await state.update_data(enter_telephone=message.text)
         elif message.contact:
             await state.update_data(enter_telephone=message.contact.phone_number)
-        await message.answer(text=LEXICON_RENT['how_contact'], reply_markup=communication_method())
+        await message.answer(
+            text=LEXICON_RENT['how_contact'], reply_markup=communication_method()
+        )
         await state.set_state(FSM_RENT.how_contact)
     else:
         await message.answer(
@@ -80,7 +85,9 @@ async def telephone_sent(message: Message, state: FSMContext):
 
 # Хендлер на кнопки выбора способа связи,
 # переводит в состояние ожидания ввода даты
-@router.callback_query(StateFilter(FSM_RENT.how_contact), F.data.in_(['call', 'telegram', 'whatsapp']))
+@router.callback_query(
+    StateFilter(FSM_RENT.how_contact), F.data.in_(['call', 'telegram', 'whatsapp'])
+)
 async def how_contact_press(callback: CallbackQuery, state: FSMContext):
     await state.update_data(how_contact=LEXICON_RENT[callback.data])
     await callback.message.delete()  # Удалить сообщение с кнопками
@@ -96,7 +103,8 @@ async def how_contact_press(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.how_contact))
 async def warning_not_contact(message: Message):
     await message.answer(
-        text=f'{LEXICON_RENT["not_contact"]}\n\n' f'{LEXICON_RENT["breaking"]}', reply_markup=cancel_rent()
+        text=f'{LEXICON_RENT["not_contact"]}\n\n' f'{LEXICON_RENT["breaking"]}',
+        reply_markup=cancel_rent(),
     )
 
 
@@ -149,7 +157,9 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
     text = TextCreator.create_text_rent(users_db, id, mode=PictureStatus.RENT, **data)
 
     await callback.message.answer(
-        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["finish"]}\n\n' f'{text}',
+        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n'
+        f'{LEXICON_RENT["finish"]}\n\n'
+        f'{text}',
         reply_markup=send(),
     )
     await callback.answer()
@@ -162,7 +172,8 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
 @router.message(StateFilter(FSM_RENT.how_room))
 async def warning_not_room(message: Message):
     await message.answer(
-        text=f'{LEXICON_RENT["not_room"]}\n\n' f'{LEXICON_RENT["breaking"]}', reply_markup=cancel_rent()
+        text=f'{LEXICON_RENT["not_room"]}\n\n' f'{LEXICON_RENT["breaking"]}',
+        reply_markup=cancel_rent(),
     )
 
 

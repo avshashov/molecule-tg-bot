@@ -12,7 +12,7 @@ class FSM_RENT(StatesGroup):  # Состояние пользователя:
     event = State()  # Какое мероприятие
     how_people = State()  # Сколько человек
     how_room = State()  # Сколько залов (1 или 2)
-    send_rent = State() # Состояние готовности к отправке сообщения админам
+    send_rent = State()  # Состояние готовности к отправке сообщения админам
 
 
 class FSM_PICTURE(StatesGroup):
@@ -22,7 +22,7 @@ class FSM_PICTURE(StatesGroup):
 
     send_buy_ready = State()
     send_order = State()
-    
+
     enter_telephone_order = State()
     enter_email_order = State()
     how_contact_order = State()
@@ -31,6 +31,4 @@ class FSM_PICTURE(StatesGroup):
     event = State()  # По какому случаю
     size = State()  # Какого размера
     mood = State()  # Какое настроение
-    color = State() # Цветовая гамма
-
-
+    color = State()  # Цветовая гамма

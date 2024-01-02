@@ -2,13 +2,16 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from config_data.config import config
-from handlers import menu_handlers, set_user_name, about_project, rent, pictures
+from app.config import config
+from app.database.settings import bot_db
+from app.handlers import rent, about_project, menu_handlers, pictures, set_user_name
 
 from aiogram.types import BotCommand
-from lexicon.lexicon_ru import LEXICON_SET_MENU
+from app.lexicon.lexicon_ru import LEXICON_SET_MENU
 
 from aiogram.fsm.storage.memory import MemoryStorage
+
+from app.middlewares import SessionMiddleware
 
 # Логирование
 logger = logging.getLogger(__name__)
@@ -46,6 +49,7 @@ async def main():
     await set_main_menu(bot)
 
     # Регистрация роутеров
+    dp.update.middleware(SessionMiddleware(bot_db.async_session_maker))
     dp.include_router(menu_handlers.router)
     dp.include_router(set_user_name.router)
     dp.include_router(about_project.router)
