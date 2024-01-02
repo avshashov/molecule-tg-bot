@@ -5,7 +5,7 @@ from app import schemas
 from app.database.models import Media, MediaBlock, MediaType
 
 
-class CRUDUser:
+class CRUDMedia:
     @staticmethod
     async def create_media(
         session: AsyncSession, media_fields: schemas.MediaCreate
