@@ -30,14 +30,11 @@ async def main():
     # Настройка логирования
     logging.basicConfig(
         level=logging.INFO,
-        format='%(filename)s:%(lineno)d #%(levelname)-8s ' '[%(asctime)s] - %(name)s - %(message)s'
+        format='[%(asctime)s] - %(levelname)s - %(message)s'
     )
 
     # Печать в консоль информации о начале запуска бота
     logger.info('Starting bot')
-
-    # Загрузка конфига
-    #config: Config = load_config()
 
     # Инициализация хранилища (MemoryStorage) Нужен Redis?
     storage = MemoryStorage()
