@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class MediaBase(BaseModel):
     title: str
     description: str | None = None
-    media_id: int
+    media_id: str
 
 
 class MediaCreate(MediaBase):
