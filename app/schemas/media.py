@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class MediaBase(BaseModel):
-    media_name: str
+    title: str
     description: str | None = None
     media_id: int
 
@@ -21,4 +21,4 @@ class Media(MediaBase):
 class MediaUpdate(BaseModel):
     media_id: str | None = None
     description: str | None = None
-    media_name: str | None = None
+    title: str | None = None
