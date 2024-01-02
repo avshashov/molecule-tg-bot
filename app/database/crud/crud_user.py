@@ -56,3 +56,16 @@ class CRUDUser:
         query = select(User).where(User.id == tg_user_id)
         stmt = await session.execute(query)
         return bool(stmt)
+    
+    @staticmethod
+    async def get_user_full_name(session: AsyncSession, tg_user_id: int) -> User | None:
+        """
+        Метод получения имени пользователя.
+
+        :param session: Асинхронная сессия.
+        :param tg_user_id: Телеграм ID.
+        :return: Сущность пользователя.
+        """
+        query = select(User.full_name).where(User.user_id == tg_user_id)
+        stmt = await session.execute(query)
+        return stmt.scalar()
