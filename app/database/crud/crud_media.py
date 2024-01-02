@@ -42,6 +42,20 @@ class CRUDMedia:
         return list(stmt.scalars())
 
     @staticmethod
+    async def get_media_by_id(session: AsyncSession, id: int) -> Media:
+        """
+        Метод получения медиа по ID.
+
+        :param session: Асинхронная сессия.
+        :param id: Первичный ключ медиа в БД.
+        :return: Сущность медиа.
+        """
+
+        query = select(Media).where(Media.id == id)
+        stmt = await session.execute(query)
+        return stmt.scalar()
+
+    @staticmethod
     async def delete_media(session: AsyncSession, media_id: int) -> None:
         """
         Метод удаление медиафайла по телеграм медиа ID
@@ -51,6 +65,7 @@ class CRUDMedia:
         """
         query = delete(Media).where(Media.id == media_id)
         await session.execute(query)
+        await session.commit()
 
     @staticmethod
     async def update_media(
