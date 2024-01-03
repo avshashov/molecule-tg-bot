@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, ForeignKey, String
+from sqlalchemy import BigInteger, ForeignKey, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -53,3 +53,10 @@ class Picture(Base):
 
     picture_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     description: Mapped[str]
+
+
+class BlockText(Base):
+    __tablename__ = 'block_text'
+
+    block: Mapped[str] = mapped_column(nullable=False, unique=True)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
