@@ -21,8 +21,8 @@ class User(Base):
 class Media(Base):
     __tablename__ = 'media'
 
-    media_id: Mapped[str] = mapped_column(String, unique=True)
-    title: Mapped[str] = mapped_column(String(length=15), nullable=False)
+    media_id: Mapped[str] = mapped_column(unique=True)
+    title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
     media_type_id: Mapped[int] = mapped_column(
