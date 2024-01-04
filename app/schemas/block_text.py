@@ -8,12 +8,3 @@ class BlockTextBase(BaseModel):
 
 class BlockTextCreate(BlockTextBase):
     pass
-
-
-class BlockText(BlockTextBase):
-    id: int
-
-
-class BlockTextUpdate(BaseModel):
-    text: str | None = None
-    block: str | None = None
