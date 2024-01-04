@@ -2,17 +2,14 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import BotCommand, BotCommandScopeChat
+
 from app.config import config
 from app.database.settings import bot_db
-from app.handlers import rent, about_project, menu_handlers, pictures, set_user_name
-
-from aiogram.types import BotCommand
-
+from app.handlers import about_project, menu_handlers, pictures, rent, set_user_name
 from app.handlers.admin import common as admin
 from app.lexicon.lexicon_ru import LEXICON_SET_MENU
-
-from aiogram.fsm.storage.memory import MemoryStorage
-
 from app.middlewares import SessionMiddleware
 
 # Логирование
@@ -27,12 +24,19 @@ async def set_main_menu(bot: Bot):
     ]
     await bot.set_my_commands(main_menu_commands)
 
+    main_menu_commands.append(
+        BotCommand(command='admin', description='Панель администратора')
+    )
+    await bot.set_my_commands(
+        main_menu_commands,
+        scope=BotCommandScopeChat(chat_id=config.tg_bot.admin_group_id),
+    )
+
 
 async def main():
     # Настройка логирования
     logging.basicConfig(
-        level=logging.INFO,
-        format='[%(asctime)s] - %(levelname)s - %(message)s'
+        level=logging.INFO, format='[%(asctime)s] - %(levelname)s - %(message)s'
     )
 
     # Печать в консоль информации о начале запуска бота
