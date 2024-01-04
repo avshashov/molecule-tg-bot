@@ -41,3 +41,7 @@ class FSMAdminRent(StatesGroup):
     enter_new_rent_text = State()
     open_photo = State()
     send_rent_photo = State()
+
+
+class FSMAdminAboutProject(StatesGroup):
+    upload_presentation = State()
