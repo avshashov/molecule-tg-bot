@@ -17,3 +17,6 @@ class MediaType(int, Enum):
     PHOTO = 1
     PRESENTATION = 2
 
+
+class BlockText(str, Enum):
+    RENT = 'Аренда'
