@@ -5,9 +5,11 @@ from aiogram.types import Message
 
 from app.keyboards.admin.common import admin_panel_kb
 from app.handlers.admin.rent import router as rent_router
+from app.handlers.admin.about_project import router as about_project_router
+
 
 router = Router()
-router.include_router(rent_router)
+router.include_routers(rent_router, about_project_router)
 
 
 @router.message(Command(commands='admin'))
