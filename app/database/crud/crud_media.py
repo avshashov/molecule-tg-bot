@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
@@ -37,6 +37,7 @@ class CRUDMedia:
             .join(MediaType)
             .join(MediaBlock)
             .where(MediaType.id == media_type_id, MediaBlock.id == media_block_id)
+            .order_by(asc(Media.created_at))
         )
         stmt = await session.execute(query)
         return list(stmt.scalars())
