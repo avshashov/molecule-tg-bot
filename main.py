@@ -7,6 +7,8 @@ from app.database.settings import bot_db
 from app.handlers import rent, about_project, menu_handlers, pictures, set_user_name
 
 from aiogram.types import BotCommand
+
+from app.handlers.admin import common as admin
 from app.lexicon.lexicon_ru import LEXICON_SET_MENU
 
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -52,6 +54,7 @@ async def main():
     dp.include_router(about_project.router)
     dp.include_router(rent.router)
     dp.include_router(pictures.router)
+    dp.include_router(admin.router)
 
     # Запуск поллинга
     await bot.delete_webhook(drop_pending_updates=True)
