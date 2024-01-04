@@ -21,7 +21,7 @@ class CRUDBlockText:
         await session.commit()
 
     @staticmethod
-    async def get_block_text(session: AsyncSession, block: str) -> str | None:
+    async def get_text_by_block(session: AsyncSession, block: str) -> str | None:
         """
         Метод получения текста по названию блока.
 
@@ -29,7 +29,7 @@ class CRUDBlockText:
         :param block: Название блока.
         :return: Текст блока.
         """
-        query = select(BlockText).where(BlockText.block == block)
+        query = select(BlockText.text).where(BlockText.block == block)
         stmt = await session.execute(query)
         return stmt.scalar()
 
