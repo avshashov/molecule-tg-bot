@@ -51,7 +51,7 @@ class MediaBlock(Base):
 class Picture(Base):
     __tablename__ = 'picture'
 
-    picture_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+    picture_id: Mapped[str] = mapped_column(unique=True)
     title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
