@@ -57,14 +57,14 @@ class CRUDMedia:
         return stmt.scalar()
 
     @staticmethod
-    async def delete_media(session: AsyncSession, media_id: int) -> None:
+    async def delete_media(session: AsyncSession, id: int) -> None:
         """
-        Метод удаление медиафайла по телеграм медиа ID.
+        Метод удаление медиафайла по медиа ID.
 
         :param session: Асинхронная сессия.
-        :param media_id: Телеграм медиа ID.
+        :param id: Первичный ключ медиа в БД.
         """
-        query = delete(Media).where(Media.id == media_id)
+        query = delete(Media).where(Media.id == id)
         await session.execute(query)
         await session.commit()
 

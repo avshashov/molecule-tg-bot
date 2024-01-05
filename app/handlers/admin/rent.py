@@ -111,7 +111,7 @@ async def confirm_delete_or_edit_current_rent_photo(
 ):
     if callback.data == 'confirm delete rent photo':
         data = await state.get_data()
-        await CRUDMedia.delete_media(session, media_id=int(data['photo_id']))
+        await CRUDMedia.delete_media(session, id=int(data['photo_id']))
     list_photo = await CRUDMedia.get_media(
         session=session, media_type_id=MediaType.PHOTO, media_block_id=MediaBlock.RENT
     )
