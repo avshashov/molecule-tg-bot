@@ -7,11 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.constants import MediaBlock, MediaType
 from app.database.crud import CRUDMedia
 from app.fsm.fsm import FSMAdminAboutProject
-from app.keyboards.admin.about_project import (
+from app.keyboards.admin.about_project_kb import (
     admin_about_project_menu_kb,
     cancel_upload_presentation,
 )
-from app.keyboards.admin.common import admin_panel_kb
+from app.keyboards.admin.common_kb import admin_panel_kb
 from app.schemas import MediaCreate
 
 router = Router()

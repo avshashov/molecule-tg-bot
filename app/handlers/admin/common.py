@@ -3,13 +3,13 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from app.keyboards.admin.common import admin_panel_kb
-from app.handlers.admin.rent import router as rent_router
 from app.handlers.admin.about_project import router as about_project_router
-
+from app.handlers.admin.rent import router as rent_router
+from app.handlers.admin.scheduler_settings import router as scheduler_router
+from app.keyboards.admin.common_kb import admin_panel_kb
 
 router = Router()
-router.include_routers(rent_router, about_project_router)
+router.include_routers(rent_router, about_project_router, scheduler_router)
 
 
 @router.message(Command(commands='admin'))
