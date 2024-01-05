@@ -45,3 +45,12 @@ class FSMAdminRent(StatesGroup):
 
 class FSMAdminAboutProject(StatesGroup):
     upload_presentation = State()
+
+
+class FSMAdminPicture(StatesGroup):
+    upload_picture = State()
+    enter_picture_title = State()
+    enter_picture_description = State()
+    enter_new_picture_title = State()
+    enter_new_picture_description = State()
+    open_picture = State()
