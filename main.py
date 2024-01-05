@@ -12,12 +12,10 @@ from app.handlers.admin import common as admin
 from app.lexicon.lexicon_ru import LEXICON_SET_MENU
 from app.middlewares import SessionMiddleware
 
-# Логирование
 logger = logging.getLogger(__name__)
 
 
-# Функция настройки меню
-async def set_main_menu(bot: Bot):
+async def set_menu_commands(bot: Bot):
     main_menu_commands = [
         BotCommand(command=command, description=description)
         for command, description in LEXICON_SET_MENU.items()
@@ -33,34 +31,33 @@ async def set_main_menu(bot: Bot):
     )
 
 
-async def main():
-    # Настройка логирования
+def setup_dispatcher() -> Dispatcher:
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
+    dp.update.middleware(SessionMiddleware(bot_db.async_session_maker))
+    dp.include_routers(
+        menu_handlers.router,
+        set_user_name.router,
+        about_project.router,
+        rent.router,
+        pictures.router,
+        admin.router,
+    )
+    return dp
+
+
+def setup_logger() -> None:
     logging.basicConfig(
         level=logging.INFO, format='[%(asctime)s] - %(levelname)s - %(message)s'
     )
-
-    # Печать в консоль информации о начале запуска бота
     logger.info('Starting bot')
 
-    # Инициализация хранилища (MemoryStorage) Нужен Redis?
-    storage = MemoryStorage()
 
+async def main():
+    setup_logger()
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
-    dp = Dispatcher(storage=storage)
-
-    # Меню бота
-    await set_main_menu(bot)
-
-    # Регистрация роутеров
-    dp.update.middleware(SessionMiddleware(bot_db.async_session_maker))
-    dp.include_router(menu_handlers.router)
-    dp.include_router(set_user_name.router)
-    dp.include_router(about_project.router)
-    dp.include_router(rent.router)
-    dp.include_router(pictures.router)
-    dp.include_router(admin.router)
-
-    # Запуск поллинга
+    dp = setup_dispatcher()
+    await set_menu_commands(bot)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
