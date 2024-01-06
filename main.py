@@ -4,6 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeChat
+from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 from app.config import config
 from app.database.settings import bot_db
@@ -35,6 +36,7 @@ def setup_dispatcher() -> Dispatcher:
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
     dp.update.middleware(SessionMiddleware(bot_db.async_session_maker))
+    dp.callback_query.middleware(CallbackAnswerMiddleware())
     dp.include_routers(
         menu_handlers.router,
         set_user_name.router,

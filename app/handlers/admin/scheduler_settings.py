@@ -26,7 +26,6 @@ async def admin_pictures_menu(callback: CallbackQuery):
         text='Меню настройки картин для рассылки пользователям',
         reply_markup=picture_menu_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'back admin panel from pictures')
@@ -37,7 +36,6 @@ async def back_to_admin_panel(callback: CallbackQuery):
         f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
         reply_markup=admin_panel_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'add picture')
@@ -48,7 +46,6 @@ async def add_new_picture(callback: CallbackQuery, state: FSMContext):
         reply_markup=cancel_kb(),
     )
     await state.set_state(FSMAdminPicture.upload_picture)
-    await callback.answer()
 
 
 @router.message(F.photo, StateFilter(FSMAdminPicture.upload_picture))
@@ -133,7 +130,6 @@ async def edit_pictures_menu(
             reply_markup=list_of_current_pictures_kb(pictures),
         )
         await state.set_state(FSMAdminPicture.open_picture)
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'back pictures menu')
@@ -142,7 +138,6 @@ async def back_to_pictures_menu(callback: CallbackQuery):
         text='Меню настройки картин для рассылки пользователям',
         reply_markup=picture_menu_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'delete picture menu')
@@ -150,7 +145,6 @@ async def delete_picture_menu(callback: CallbackQuery):
     await callback.message.edit_reply_markup(
         reply_markup=confirm_delete_picture_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'cancel delete picture')
@@ -158,7 +152,6 @@ async def cancel_delete_picture(callback: CallbackQuery):
     await callback.message.edit_reply_markup(
         reply_markup=open_picture_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'confirm delete picture')
@@ -182,7 +175,6 @@ async def confirm_delete_picture(
             reply_markup=list_of_current_pictures_kb(pictures),
         )
         await state.set_state(FSMAdminPicture.open_picture)
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'change picture title')
@@ -198,7 +190,6 @@ async def change_picture_title(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.set_state(FSMAdminPicture.enter_new_picture_title)
     await state.update_data(**data)
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'change picture description')
@@ -211,7 +202,6 @@ async def change_picture_description(callback: CallbackQuery, state: FSMContext)
     data = await state.get_data()
     await state.set_state(FSMAdminPicture.enter_new_picture_description)
     await state.update_data(**data)
-    await callback.answer()
 
 
 @router.message(
@@ -280,4 +270,3 @@ async def open_picture(
     await callback.message.answer_photo(
         photo=picture.picture_id, caption=text, reply_markup=open_picture_kb()
     )
-    await callback.answer()

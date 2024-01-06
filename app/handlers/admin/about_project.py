@@ -40,7 +40,6 @@ async def admin_about_project_menu(
         await callback.message.edit_text(
             text='Презентация не загружена', reply_markup=admin_about_project_menu_kb()
         )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'add change presentation')
@@ -50,7 +49,6 @@ async def add_presentation_menu(callback: CallbackQuery, state: FSMContext):
         text='Загрузи презентацию', reply_markup=cancel_upload_presentation()
     )
     await state.set_state(FSMAdminAboutProject.upload_presentation)
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'back admin panel from project')
@@ -61,7 +59,6 @@ async def back_to_admin_panel(callback: CallbackQuery):
         f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
         reply_markup=admin_panel_kb(),
     )
-    await callback.answer()
 
 
 @router.message(F.document, StateFilter(FSMAdminAboutProject.upload_presentation))

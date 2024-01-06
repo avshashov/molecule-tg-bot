@@ -36,14 +36,12 @@ async def buy_button(callback: CallbackQuery):
     await callback.message.edit_text(
         text=LEXICON_PICTURES['buy_ready_description'], reply_markup=buy_ready()
     )
-    await callback.answer()
 
 
 # Хендлер на кнопку 'Свяжитесь со мной' и 'Заказать картину'
 @router.callback_query(F.data == 'contact_me')
 @router.callback_query(F.data == 'order_painting')
 async def contact_button(callback: CallbackQuery, state: FSMContext):
-    await callback.answer()
     if callback.data == 'contact_me':
         await callback.message.edit_text(
             text=LEXICON_PICTURES['how_contact_buy'], reply_markup=method_contact()
@@ -63,7 +61,6 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
         text=LEXICON_PICTURES['cancel_process'], reply_markup=pictures()
     )
     await state.clear()
-    await callback.answer()
 
 
 # Хендлер на кнопку "Назад" - Возвращает на шаг назад
@@ -72,7 +69,6 @@ async def back_button(callback: CallbackQuery):
     await callback.message.edit_text(
         text=LEXICON_PICTURES['pictures'], reply_markup=pictures()
     )
-    await callback.answer()
 
 
 # Хендлер на кнопки 'Звонок', 'whatsapp', 'telegram'
@@ -81,7 +77,6 @@ async def back_button(callback: CallbackQuery):
     F.data.in_(['call', 'telegram', 'whatsapp']),
 )
 async def how_contact(callback: CallbackQuery, state: FSMContext):
-    await callback.answer()
     await callback.message.delete()
     await state.update_data(how_contact=LEXICON_RENT[callback.data])
     await callback.message.answer(
@@ -111,7 +106,6 @@ async def warning_not_contact(message: Message):
     F.data == 'email',
 )
 async def email_button(callback: CallbackQuery, state: FSMContext):
-    await callback.answer()
     await callback.message.delete()
     await callback.message.answer(text=LEXICON_PICTURES['enter_email'])
     if FSM_PICTURE.how_contact_buy_ready == await state.get_state():
@@ -259,7 +253,6 @@ async def color(message: Message, state: FSMContext):
     StateFilter(FSM_PICTURE.send_buy_ready, FSM_PICTURE.send_order),
 )
 async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
-    await callback.answer()
     await callback.message.delete()
     data = await state.get_data()
     await callback.message.answer(text=LEXICON_RENT['sending'])
@@ -275,7 +268,6 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     F.data == 'correct', StateFilter(FSM_PICTURE.send_buy_ready, FSM_PICTURE.send_order)
 )
 async def correct_button(callback: CallbackQuery, state: FSMContext):
-    await callback.answer()
     if FSM_PICTURE.send_buy_ready == await state.get_state():
         await callback.message.edit_text(
             text=LEXICON_PICTURES['how_contact_buy'], reply_markup=method_contact()

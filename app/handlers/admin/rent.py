@@ -26,7 +26,6 @@ router = Router()
 @router.callback_query(F.data == 'admin rent')
 async def admin_rent_menu(callback: CallbackQuery):
     await callback.message.edit_text(text='жми', reply_markup=rent_menu_kb())
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'back admin panel')
@@ -36,7 +35,6 @@ async def back_to_admin_panel(callback: CallbackQuery):
         f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
         reply_markup=admin_panel_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'edit rent photo')
@@ -45,7 +43,6 @@ async def edit_rent_photo_menu(callback: CallbackQuery):
         text=f'Здесь ты можешь загрузить новое фото или изменить/удалить текущие',
         reply_markup=edit_rent_photo_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'add new rent photo')
@@ -55,7 +52,6 @@ async def add_new_rent_photo(callback: CallbackQuery, state: FSMContext):
         reply_markup=cancel_send_rent_photo_kb(),
     )
     await state.set_state(FSMAdminRent.send_rent_photo)
-    await callback.answer()
 
 
 @router.message(F.photo, StateFilter(FSMAdminRent.send_rent_photo))
@@ -91,7 +87,6 @@ async def back_to_rent_menu(callback: CallbackQuery):
         text='жми',
         reply_markup=rent_menu_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'cancel send rent photo')
@@ -100,7 +95,6 @@ async def cancel_send_rent_photo(callback: CallbackQuery):
         text='Здесь ты можешь загрузить новое фото или изменить/удалить текущие',
         reply_markup=edit_rent_photo_kb(),
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'confirm delete rent photo')
@@ -121,7 +115,6 @@ async def confirm_delete_or_edit_current_rent_photo(
         reply_markup=list_of_current_rent_photo_kb(list_photo),
     )
     await state.set_state(FSMAdminRent.open_photo)
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'back edit rent photo')
@@ -132,7 +125,6 @@ async def back_to_edit_rent_photo(callback: CallbackQuery, state: FSMContext):
         reply_markup=edit_rent_photo_kb(),
     )
     await state.clear()
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'delete rent photo')
@@ -140,7 +132,6 @@ async def delete_rent_photo_menu(callback: CallbackQuery):
     await callback.message.edit_reply_markup(
         reply_markup=confirm_delete_rent_photo_kb()
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'change rent photo title')
@@ -153,7 +144,6 @@ async def change_rent_photo_title(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.set_state(FSMAdminRent.enter_new_photo_title)
     await state.update_data(**data)
-    await callback.answer()
 
 
 @router.message(F.text, StateFilter(FSMAdminRent.enter_new_photo_title))
@@ -175,7 +165,6 @@ async def get_new_photo_title(
 @router.callback_query(F.data == 'cancel delete rent photo')
 async def cancel_delete_rent_photo(callback: CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=open_rent_photo_kb())
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'cancel change rent title')
@@ -197,7 +186,6 @@ async def open_rent_photo(
     await callback.message.answer_photo(
         photo=photo.media_id, caption=text, reply_markup=open_rent_photo_kb()
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'change rent text')
@@ -207,7 +195,6 @@ async def send_photo(callback: CallbackQuery, state: FSMContext):
         reply_markup=cancel_change_rent_text(),
     )
     await state.set_state(FSMAdminRent.enter_new_rent_text)
-    await callback.answer()
 
 
 @router.message(F.text, StateFilter(FSMAdminRent.enter_new_rent_text))
@@ -244,4 +231,3 @@ async def view_rent_block(callback: CallbackQuery, session: AsyncSession):
         await callback.message.answer(
             text='Описание отсутствует, Жми', reply_markup=rent_menu_kb()
         )
-    await callback.answer()
