@@ -36,7 +36,7 @@ def load_config(path: str | None = None) -> Config:
     env.read_env(path)
 
     return Config(
-        tg_bot=TgBot(token=env('BOT_TOKEN'), admin_group_id=env('ADMIN_GROUP_ID')),
+        tg_bot=TgBot(token=env('BOT_TOKEN'), admin_group_id=env.int('ADMIN_GROUP_ID')),
         db=DatabaseConfig(
             dbms=env('dbms'),
             database=env('database'),
