@@ -26,7 +26,9 @@ router = Router()
 
 @router.callback_query(F.data == 'admin rent')
 async def admin_rent_menu(callback: CallbackQuery):
-    await callback.message.edit_text(text='жми', reply_markup=rent_menu_kb())
+    await callback.message.edit_text(
+        text='Настройка блока аренды', reply_markup=rent_menu_kb()
+    )
 
 
 @router.callback_query(F.data == 'back admin panel')
@@ -85,7 +87,7 @@ async def get_photo_title(message: Message, state: FSMContext, session: AsyncSes
 @router.callback_query(F.data == 'back rent menu')
 async def back_to_rent_menu(callback: CallbackQuery):
     await callback.message.edit_text(
-        text='жми',
+        text='Настройка блока аренды',
         reply_markup=rent_menu_kb(),
     )
 
@@ -112,7 +114,7 @@ async def confirm_delete_or_edit_current_rent_photo(
     )
     await callback.message.delete()
     await callback.message.answer(
-        text='Раздел добавления/редактирования фото',
+        text='Раздел редактирования текущих фотографий',
         reply_markup=list_of_current_rent_photo_kb(list_photo),
     )
     await state.set_state(FSMAdminRent.open_photo)
@@ -122,7 +124,7 @@ async def confirm_delete_or_edit_current_rent_photo(
 async def back_to_edit_rent_photo(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(
-        text='Текущие фото',
+        text='Здесь ты можешь загрузить новое фото или изменить/удалить текущие',
         reply_markup=edit_rent_photo_kb(),
     )
     await state.clear()
@@ -202,7 +204,6 @@ async def send_photo(callback: CallbackQuery, state: FSMContext):
 async def get_new_rent_text(message: Message, state: FSMContext, session: AsyncSession):
     text = message.md_text.strip()
     if await CRUDBlockText.get_text_by_block(session, block=BlockText.RENT):
-
         await CRUDBlockText.update_text_by_block(
             session, block=BlockText.RENT, text=text
         )
@@ -211,7 +212,7 @@ async def get_new_rent_text(message: Message, state: FSMContext, session: AsyncS
             session, text_fields=BlockTextCreate(text=text, block=BlockText.RENT)
         )
     await message.answer(text='Текст изменен')
-    await message.answer(text='жми', reply_markup=rent_menu_kb())
+    await message.answer(text='Настройка блока аренды', reply_markup=rent_menu_kb())
     await state.clear()
 
 
@@ -227,9 +228,12 @@ async def view_rent_block(callback: CallbackQuery, session: AsyncSession):
             photos = [InputMediaPhoto(media=photo.media_id) for photo in photos]
             if photos:
                 await callback.message.answer_media_group(media=photos)
-        await callback.message.answer(text='Жми', reply_markup=rent_menu_kb())
+        await callback.message.answer(
+            text='Настройка блока аренды', reply_markup=rent_menu_kb()
+        )
     else:
         await callback.message.delete()
         await callback.message.answer(
-            text='Описание отсутствует, Жми', reply_markup=rent_menu_kb()
+            text='Описание отсутствует.' '\n\nНастройка блока аренды',
+            reply_markup=rent_menu_kb(),
         )
