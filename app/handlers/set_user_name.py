@@ -25,10 +25,8 @@ async def of_course_answer(callback: CallbackQuery, session: AsyncSession):
         full_name=callback.from_user.full_name,
         )
     await CRUDUser.create_user(session, user)
-    await callback.message.edit_text(text='Отлично 👍\n\n')
-    await callback.message.answer(
-        text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb()
-    )
+    await callback.message.delete()
+    await callback.message.answer(text='Отлично 👍\n\n', reply_markup=menu_kb())
 
 
 # Хендлер на кнопку "Изменить имя" устанавливает машину состояний: ожидание ввода имени +
@@ -61,8 +59,8 @@ async def confirm(callback: CallbackQuery, state: FSMContext, session: AsyncSess
         )
     await CRUDUser.create_user(session, user)
     await state.clear()
+    await callback.message.delete()
     await callback.message.answer(
-        text=f'Приветствую тебя 🤝, {full_name}!\n\n'
-        f'{LEXICON_MENU_BUTTONS["text_menu"]}',
+        text=f'Приветствую тебя 🤝, {full_name}!',
         reply_markup=menu_kb(),
     )

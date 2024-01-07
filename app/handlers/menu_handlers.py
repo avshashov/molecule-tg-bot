@@ -21,8 +21,7 @@ async def start_command(message: Message, state: FSMContext, session: AsyncSessi
     await state.clear()
     if full_name := await CRUDUser.get_user_full_name(session, message.from_user.id):
         await message.answer(
-            text=f'Приветствую тебя 🤝, {full_name}, я Небула🌀 - бот Молекулы©️\n\n'
-            f'{LEXICON_MENU_BUTTONS["text_menu"]}',
+            text=f'Приветствую тебя 🤝, {full_name}, я Небула🌀 - бот Молекулы©️',
             reply_markup=menu_kb(),
         )
 
@@ -60,6 +59,7 @@ async def invite_command(message: Message):
 # Хендлер на кнопку 'Главное меню'
 @router.callback_query(F.data == 'main_menu')
 async def main_menu_button(callback: CallbackQuery):
+    await callback.message.delete()
     await callback.message.answer(
         text=LEXICON_MENU_BUTTONS["text_menu"], reply_markup=menu_kb()
     )
