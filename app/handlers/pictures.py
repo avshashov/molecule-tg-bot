@@ -58,7 +58,7 @@ async def contact_button(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == 'cancel_button_pictures', ~StateFilter(default_state))
 async def cancel_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
-        text=LEXICON_PICTURES['cancel_process'], reply_markup=pictures()
+        text=LEXICON_PICTURES['cancel_process'], reply_markup=buy_ready()
     )
     await state.clear()
 
