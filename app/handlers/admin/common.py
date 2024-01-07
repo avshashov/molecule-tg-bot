@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from app.config import config
+from config import config
 from app.filters import CallbackAdminFilter, MessageAdminFilter
 from app.handlers.admin.about_project import router as about_project_router
 from app.handlers.admin.rent import router as rent_router

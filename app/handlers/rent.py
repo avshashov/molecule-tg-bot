@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 
-from app.config import config
+from config import config
 from app.constants import PictureStatus
 from app.database.database import photo_room, users_db
 from app.fsm.fsm import FSM_RENT

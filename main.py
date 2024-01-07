@@ -6,7 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeChat
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
-from app.config import config
+from config import config
 from app.database.settings import bot_db
 from app.handlers import about_project, menu_handlers, pictures, rent, set_user_name
 from app.handlers.admin import common as admin
