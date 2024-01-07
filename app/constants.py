@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class PictureStatus(Enum):
+class PictureStatus(str, Enum):
     READY = 'ready'
     ORDER = 'order'
     RENT = 'rent_order'
