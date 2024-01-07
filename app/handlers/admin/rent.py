@@ -31,15 +31,6 @@ async def admin_rent_menu(callback: CallbackQuery):
     )
 
 
-@router.callback_query(F.data == 'back admin panel')
-async def back_to_admin_panel(callback: CallbackQuery):
-    await callback.message.edit_text(
-        text=f'Панель администратора.'
-        f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
-        reply_markup=admin_panel_kb(),
-    )
-
-
 @router.callback_query(F.data == 'edit rent photo')
 async def edit_rent_photo_menu(callback: CallbackQuery):
     await callback.message.edit_text(
