@@ -1,10 +1,12 @@
 from aiogram import F, Router
+from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.crud import CRUDUser
+from app.constants import BlockText
+from app.database.crud import CRUDBlockText, CRUDUser
 from app.fsm.fsm import FSM_SET_NAME
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_kb
@@ -43,8 +45,10 @@ async def start_command(message: Message, state: FSMContext, session: AsyncSessi
 
 # Хендлер на команду "/contacts"
 @router.message(Command(commands='contacts'))
-async def contacts_command(message: Message):
-    await message.answer(text=LEXICON_MENU_BUTTONS['contacts'])
+async def contacts_command(message: Message, session: AsyncSession):
+    contacts = await CRUDBlockText.get_text_by_block(session, block=BlockText.CONTACTS)
+    text = contacts if contacts else 'Контакты не заданы'
+    await message.answer(text=text, parse_mode=ParseMode.MARKDOWN_V2)
 
 
 # Хендлер на команду "/invite"
