@@ -4,14 +4,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.database import users_db
+from app.database.crud import CRUDUser
 from app.fsm.fsm import FSM_SET_NAME
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_kb
 from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_SET_USER_NAME
-
-from app.database.crud import CRUDUser
-
 
 router = Router()
 
@@ -22,7 +19,7 @@ router = Router()
 @router.message(CommandStart())
 async def start_command(message: Message, state: FSMContext, session: AsyncSession):
     await state.clear()
-    if full_name:= await CRUDUser.get_user_full_name(session, message.from_user.id):
+    if full_name := await CRUDUser.get_user_full_name(session, message.from_user.id):
         await message.answer(
             text=f'Приветствую тебя 🤝, {full_name}, я Небула🌀 - бот Молекулы©️\n\n'
             f'{LEXICON_MENU_BUTTONS["text_menu"]}',
@@ -54,8 +51,9 @@ async def contacts_command(message: Message):
 # Хендлер на команду "/invite"
 @router.message(Command(commands='invite'))
 async def invite_command(message: Message):
+    bot = await message.bot.get_me()
     await message.answer(
-        text=f'{LEXICON_MENU_BUTTONS["invite"]}\n\nhttps://t.me/Molecule_nebula_bot'
+        text=f'{LEXICON_MENU_BUTTONS["invite"]}\n\nhttps://t.me/{bot.username}'
     )
 
 
