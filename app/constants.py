@@ -20,3 +20,4 @@ class MediaType(int, Enum):
 
 class BlockText(str, Enum):
     RENT = 'Аренда'
+    CONTACTS = 'Контакты'

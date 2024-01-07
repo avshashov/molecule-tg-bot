@@ -54,3 +54,7 @@ class FSMAdminPicture(StatesGroup):
     enter_new_picture_title = State()
     enter_new_picture_description = State()
     open_picture = State()
+
+
+class FSMAdminContacts(StatesGroup):
+    enter_contacts = State()
