@@ -1,8 +1,8 @@
-TgBot:
-  BOT_TOKEN: # токен бота (str)
-  ADMIN_GROUP_ID: # ID группы администраторов (int)
+tg_bot:
+  token: # токен бота (str)
+  admin_group_id: # ID группы администраторов (int)
 
-DatabaseConfig:
+db:
   dbms: # название используемой СУБД (str)
   driver: # драйвер для подключения к БД (str)
   host: # хост БД (str)
