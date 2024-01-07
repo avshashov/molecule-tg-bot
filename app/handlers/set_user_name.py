@@ -4,11 +4,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.database import users_db
 from app.fsm.fsm import FSM_SET_NAME
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_name_kb
-from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_SET_USER_NAME
+from app.lexicon.lexicon_ru import LEXICON_SET_USER_NAME
 from app.database.crud import CRUDUser
 from app.schemas import UserCreate
 

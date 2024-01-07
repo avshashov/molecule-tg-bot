@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.constants import MediaBlock, MediaType, BlockText
 from app.database.crud import CRUDMedia, CRUDBlockText
 from app.fsm.fsm import FSMAdminRent
-from app.keyboards.admin.common_kb import admin_panel_kb
 from app.keyboards.admin.rent_kb import (
     cancel_send_rent_photo_kb,
     confirm_delete_rent_photo_kb,
