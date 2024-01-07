@@ -1,4 +1,7 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.constants import PictureStatus
+from app.database.crud import CRUDUser
 
 
 # формирование сообшений
@@ -43,16 +46,36 @@ class TextCreator:
         return finish_text
 
     @staticmethod
-    def create_text_rent(users_db, user_id, mode: str, **kwargs) -> str:
+    async def create_text_rent(
+        session: AsyncSession, user_id: int, mode: str, **kwargs
+    ) -> str:
         if mode == PictureStatus.RENT:
+            full_name, username = await TextCreator._get_username_and_full_name(
+                session, user_id
+            )
             text = (
                 f'Заказ: Аренда помещения\n\n'
-                f'Имя: {users_db[user_id]["name"]}\n'
+                f'Имя: {full_name}\n'
+                f'Контакт: @{username}\n'
                 f'Телефон: {kwargs["enter_telephone"]}\n'
                 f'Способ связи: {kwargs["how_contact"]}\n'
                 f'Дата: {kwargs["date"]}\n'
                 f'Мероприятие: {kwargs["event"]}\n'
                 f'Сколько человек: {kwargs["how_people"]}\n'
-                f'Залов требуется: {kwargs["how_room"]}'
             )
         return text
+
+    @staticmethod
+    async def _get_username_and_full_name(
+        session: AsyncSession, user_id: int
+    ) -> tuple[str, str] | None:
+        """
+        Метод получения никнейма и полного имени пользователя по telegram user ID.
+
+        :param session: Асинхронная сессия.
+        :param user_id: Телеграм ID.
+        :return: Кортеж из никнейма и имени.
+        """
+        user = await CRUDUser.get_user(session, user_id)
+        if user:
+            return user.full_name, user.username
