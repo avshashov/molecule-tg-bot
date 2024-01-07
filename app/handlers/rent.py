@@ -7,6 +7,7 @@ from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove, InputMedi
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.crud import CRUDBlockText, CRUDMedia
+from app.keyboards.menu_kb import menu_kb
 from config import config
 from app.constants import PictureStatus, BlockText, MediaType, MediaBlock
 from app.fsm.fsm import FSM_RENT
@@ -155,7 +156,7 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     data = await state.get_data()
     await callback.message.answer(text=LEXICON_RENT['sending'])
     # Отправка пользователю данных заявки
-    await callback.message.answer(text=f'{data["text"]}')
+    await callback.message.answer(text=f'{data["text"]}', reply_markup=menu_kb())
     # Отправка заявки в чат с админами
     await bot.send_message(chat_id=config.tg_bot.admin_group_id, text=f'{data["text"]}')
     await state.clear()
