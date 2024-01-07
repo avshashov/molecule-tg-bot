@@ -35,4 +35,3 @@ async def download_presentation(callback: CallbackQuery, bot: Bot):
         )
     else:
         await callback.message.answer(text='Извини, презентация пока не готова')
-    await callback.answer()

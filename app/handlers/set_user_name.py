@@ -20,7 +20,6 @@ async def of_course_answer(callback: CallbackQuery):
     await callback.message.answer(
         text=f'{LEXICON_MENU_BUTTONS["text_menu"]}', reply_markup=menu_kb()
     )
-    await callback.answer()
 
 
 # Хендлер на кнопку "Изменить имя" устанавливает машину состояний: ожидание ввода имени +
@@ -29,7 +28,6 @@ async def of_course_answer(callback: CallbackQuery):
 @router.callback_query(F.data == 'not', StateFilter(FSM_SET_NAME.enter_name))
 async def replace_name(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_SET_USER_NAME['what_is_your_name'])
-    await callback.answer()
     await state.set_state(FSM_SET_NAME.enter_name)
 
 
@@ -53,4 +51,3 @@ async def confirm(callback: CallbackQuery, state: FSMContext):
         f'{LEXICON_MENU_BUTTONS["text_menu"]}',
         reply_markup=menu_kb(),
     )
-    await callback.answer()

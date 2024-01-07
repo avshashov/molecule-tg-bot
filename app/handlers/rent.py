@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 
-from app.config import config
+from config import config
 from app.constants import PictureStatus
 from app.database.database import photo_room, users_db
 from app.fsm.fsm import FSM_RENT
@@ -45,7 +45,6 @@ async def cancel_button(callback: CallbackQuery, state: FSMContext):
         text=LEXICON_RENT['cancel'], reply_markup=rental_request()
     )
     await state.clear()
-    await callback.answer()
 
 
 # Хендлер на кнопку 'Оставить заявку на аренду помещения' и кнопку 'Исправить'
@@ -57,7 +56,6 @@ async def rental_request_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text=LEXICON_RENT['telephone'], reply_markup=send_contact()
     )
-    await callback.answer()
     await state.set_state(FSM_RENT.enter_telephone)
 
 
@@ -94,7 +92,6 @@ async def how_contact_press(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n' f'{LEXICON_RENT["date"]}'
     )
-    await callback.answer()
     await state.set_state(FSM_RENT.date)
 
 
@@ -162,7 +159,6 @@ async def how_room_press(callback: CallbackQuery, state: FSMContext):
         f'{text}',
         reply_markup=send(),
     )
-    await callback.answer()
     await state.set_state(FSM_RENT.send_rent)
     await state.update_data(text=text)
 
@@ -187,5 +183,4 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.message.answer(text=f'{data["text"]}')
     # Отправка заявки в чат с админами
     await bot.send_message(chat_id=config.tg_bot.admin_id, text=f'{data["text"]}')
-    await callback.answer()
     await state.clear()

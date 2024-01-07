@@ -1,11 +1,11 @@
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
 from app.database.models import Media, MediaBlock, MediaType
 
 
-class CRUDUser:
+class CRUDMedia:
     @staticmethod
     async def create_media(
         session: AsyncSession, media_fields: schemas.MediaCreate
@@ -37,38 +37,55 @@ class CRUDUser:
             .join(MediaType)
             .join(MediaBlock)
             .where(MediaType.id == media_type_id, MediaBlock.id == media_block_id)
+            .order_by(asc(Media.created_at))
         )
         stmt = await session.execute(query)
         return list(stmt.scalars())
 
     @staticmethod
-    async def delete_media(session: AsyncSession, media_id: int) -> None:
+    async def get_media_by_id(session: AsyncSession, id: int) -> Media:
         """
-        Метод удаление медиафайла по телеграм медиа ID
+        Метод получения медиа по ID.
 
         :param session: Асинхронная сессия.
-        :param media_id: Телеграм медиа ID.
+        :param id: Первичный ключ медиа в БД.
+        :return: Сущность медиа.
         """
-        query = delete(Media).where(Media.id == media_id)
+
+        query = select(Media).where(Media.id == id)
+        stmt = await session.execute(query)
+        return stmt.scalar()
+
+    @staticmethod
+    async def delete_media(session: AsyncSession, id: int) -> None:
+        """
+        Метод удаление медиафайла по медиа ID.
+
+        :param session: Асинхронная сессия.
+        :param id: Первичный ключ медиа в БД.
+        """
+        query = delete(Media).where(Media.id == id)
         await session.execute(query)
+        await session.commit()
 
     @staticmethod
     async def update_media(
-        session: AsyncSession, media_id: int, media_fields: schemas.MediaUpdate
+        session: AsyncSession, id: int, media_fields: schemas.MediaUpdate
     ) -> Media:
         """
-        Метод обновления медиафайла по телеграм медиа ID
+        Метод обновления медиафайла по ID.
 
         :param session: Асинхронная сессия.
-        :param media_id: Телеграм медиа ID.
+        :param id: Первичный ключ медиа в БД.
         :param media_fields: Новые значения для медиа.
         :return: Обновленное медиа.
         """
         query = (
             update(Media)
-            .where(Media.media_id == media_id)
+            .where(Media.id == id)
             .values(**media_fields.model_dump(exclude_none=True))
             .returning(Media)
         )
         stmt = await session.execute(query)
+        await session.commit()
         return stmt.scalar()

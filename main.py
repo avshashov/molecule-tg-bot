@@ -2,61 +2,64 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from app.config import config
-from app.database.settings import bot_db
-from app.handlers import rent, about_project, menu_handlers, pictures, set_user_name
-
-from aiogram.types import BotCommand
-from app.lexicon.lexicon_ru import LEXICON_SET_MENU
-
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import BotCommand, BotCommandScopeChat
+from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
+from config import config
+from app.database.settings import bot_db
+from app.handlers import about_project, menu_handlers, pictures, rent, set_user_name
+from app.handlers.admin import common as admin
+from app.lexicon.lexicon_ru import LEXICON_SET_MENU
 from app.middlewares import SessionMiddleware
 
-# Логирование
 logger = logging.getLogger(__name__)
 
 
-# Функция настройки меню
-async def set_main_menu(bot: Bot):
+async def set_menu_commands(bot: Bot):
     main_menu_commands = [
         BotCommand(command=command, description=description)
         for command, description in LEXICON_SET_MENU.items()
     ]
     await bot.set_my_commands(main_menu_commands)
 
-
-async def main():
-    # Настройка логирования
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(filename)s:%(lineno)d #%(levelname)-8s ' '[%(asctime)s] - %(name)s - %(message)s'
+    main_menu_commands.append(
+        BotCommand(command='admin', description='Панель администратора')
+    )
+    await bot.set_my_commands(
+        main_menu_commands,
+        scope=BotCommandScopeChat(chat_id=config.tg_bot.admin_group_id),
     )
 
-    # Печать в консоль информации о начале запуска бота
+
+def setup_dispatcher() -> Dispatcher:
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
+    dp.update.middleware(SessionMiddleware(bot_db.async_session_maker))
+    dp.callback_query.middleware(CallbackAnswerMiddleware())
+    dp.include_routers(
+        menu_handlers.router,
+        set_user_name.router,
+        about_project.router,
+        rent.router,
+        pictures.router,
+        admin.router,
+    )
+    return dp
+
+
+def setup_logger() -> None:
+    logging.basicConfig(
+        level=logging.INFO, format='[%(asctime)s] - %(levelname)s - %(message)s'
+    )
     logger.info('Starting bot')
 
-    # Загрузка конфига
-    #config: Config = load_config()
 
-    # Инициализация хранилища (MemoryStorage) Нужен Redis?
-    storage = MemoryStorage()
-
-    bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
-    dp = Dispatcher(storage=storage)
-
-    # Меню бота
-    await set_main_menu(bot)
-
-    # Регистрация роутеров
-    dp.update.middleware(SessionMiddleware(bot_db.async_session_maker))
-    dp.include_router(menu_handlers.router)
-    dp.include_router(set_user_name.router)
-    dp.include_router(about_project.router)
-    dp.include_router(rent.router)
-    dp.include_router(pictures.router)
-
-    # Запуск поллинга
+async def main():
+    setup_logger()
+    bot = Bot(token=config.tg_bot.token, parse_mode=None)
+    dp = setup_dispatcher()
+    await set_menu_commands(bot)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 

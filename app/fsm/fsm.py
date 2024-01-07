@@ -32,3 +32,25 @@ class FSM_PICTURE(StatesGroup):
     size = State()  # Какого размера
     mood = State()  # Какое настроение
     color = State()  # Цветовая гамма
+
+
+class FSMAdminRent(StatesGroup):
+    enter_photo_title = State()
+    enter_new_photo_title = State()
+    enter_photo_description = State()
+    enter_new_rent_text = State()
+    open_photo = State()
+    send_rent_photo = State()
+
+
+class FSMAdminAboutProject(StatesGroup):
+    upload_presentation = State()
+
+
+class FSMAdminPicture(StatesGroup):
+    upload_picture = State()
+    enter_picture_title = State()
+    enter_picture_description = State()
+    enter_new_picture_title = State()
+    enter_new_picture_description = State()
+    open_picture = State()

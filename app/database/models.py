@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, ForeignKey, String
+from sqlalchemy import BigInteger, ForeignKey, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -21,8 +21,8 @@ class User(Base):
 class Media(Base):
     __tablename__ = 'media'
 
-    media_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    media_name: Mapped[str] = mapped_column(String(length=15), nullable=False)
+    media_id: Mapped[str] = mapped_column(unique=True)
+    title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
     media_type_id: Mapped[int] = mapped_column(
@@ -51,5 +51,14 @@ class MediaBlock(Base):
 class Picture(Base):
     __tablename__ = 'picture'
 
-    picture_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    description: Mapped[str]
+    picture_id: Mapped[str] = mapped_column(unique=True)
+    title: Mapped[str] = mapped_column(nullable=False)
+    description: Mapped[str] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now())
+
+
+class BlockText(Base):
+    __tablename__ = 'block_text'
+
+    block: Mapped[str] = mapped_column(nullable=False, unique=True)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
