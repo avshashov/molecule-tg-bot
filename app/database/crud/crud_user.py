@@ -29,7 +29,7 @@ class CRUDUser:
         :param tg_user_id: Телеграм ID.
         :return: Сущность пользователя.
         """
-        query = select(User).where(User.id == tg_user_id)
+        query = select(User).where(User.user_id == tg_user_id)
         stmt = await session.execute(query)
         return stmt.scalar()
 
