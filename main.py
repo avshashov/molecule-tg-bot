@@ -57,7 +57,7 @@ def setup_logger() -> None:
 
 async def main():
     setup_logger()
-    bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
+    bot = Bot(token=config.tg_bot.token, parse_mode=None)
     dp = setup_dispatcher()
     await set_menu_commands(bot)
     await bot.delete_webhook(drop_pending_updates=True)

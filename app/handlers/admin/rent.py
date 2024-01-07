@@ -1,4 +1,5 @@
 from aiogram import F, Router
+from aiogram.enums import ParseMode
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
@@ -199,8 +200,9 @@ async def send_photo(callback: CallbackQuery, state: FSMContext):
 
 @router.message(F.text, StateFilter(FSMAdminRent.enter_new_rent_text))
 async def get_new_rent_text(message: Message, state: FSMContext, session: AsyncSession):
-    text = message.text.strip()
+    text = message.md_text.strip()
     if await CRUDBlockText.get_text_by_block(session, block=BlockText.RENT):
+
         await CRUDBlockText.update_text_by_block(
             session, block=BlockText.RENT, text=text
         )
@@ -217,7 +219,7 @@ async def get_new_rent_text(message: Message, state: FSMContext, session: AsyncS
 async def view_rent_block(callback: CallbackQuery, session: AsyncSession):
     text = await CRUDBlockText.get_text_by_block(session, block=BlockText.RENT)
     if text:
-        await callback.message.edit_text(text=text)
+        await callback.message.edit_text(text=text, parse_mode=ParseMode.MARKDOWN_V2)
         photos = await CRUDMedia.get_media(
             session, media_type_id=MediaType.PHOTO, media_block_id=MediaBlock.RENT
         )

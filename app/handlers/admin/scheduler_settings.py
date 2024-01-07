@@ -77,7 +77,7 @@ async def get_picture_title(message: Message, state: FSMContext):
 async def get_picture_description(
     message: Message, state: FSMContext, session: AsyncSession
 ):
-    description = message.text.strip()
+    description = message.md_text.strip()
     data = await state.get_data()
     picture = PictureCreate(
         picture_id=data['picture_id'],
@@ -219,7 +219,7 @@ async def get_new_picture_title_or_description(
     if current_state == FSMAdminPicture.enter_new_picture_title:
         picture_fields.title = message.text.strip()
     elif current_state == FSMAdminPicture.enter_new_picture_description:
-        picture_fields.description = message.text.strip()
+        picture_fields.description = message.md_text.strip()
 
     data = await state.get_data()
     await state.set_state(FSMAdminPicture.open_picture)
@@ -251,6 +251,7 @@ async def cancel_edit_picture_title_or_description(
     picture = await CRUDPicture.get_picture_by_id(session, id=data['picture_id'])
     text = f'Заголовок: {picture.title}' f'\n\nОписание: {picture.description}'
     await message.answer(text='Действие отменено', reply_markup=ReplyKeyboardRemove())
+    # TODO: не работает markdown форматирование через parse_mode=ParseMode.MARKDOWN_V2
     await message.answer_photo(
         photo=picture.picture_id,
         caption=text,
@@ -267,6 +268,7 @@ async def open_picture(
     picture = await CRUDPicture.get_picture_by_id(session, picture_id)
     await callback.message.delete()
     text = f'Заголовок: {picture.title}' f'\n\nОписание: {picture.description}'
+    # TODO: не работает markdown форматирование через parse_mode=ParseMode.MARKDOWN_V2
     await callback.message.answer_photo(
         photo=picture.picture_id, caption=text, reply_markup=open_picture_kb()
     )
