@@ -110,11 +110,15 @@ async def cancel_add_picture(message: Message, state: FSMContext):
     await state.clear()
 
 
+@router.callback_query(F.data == 'confirm delete picture')
 @router.callback_query(F.data == 'back to list pictures')
 @router.callback_query(F.data == 'edit pictures')
 async def edit_pictures_menu(
     callback: CallbackQuery, state: FSMContext, session: AsyncSession
 ):
+    if callback.data == 'confirm delete picture':
+        data = await state.get_data()
+        await CRUDPicture.delete_picture(session, id=int(data['picture_id']))
     pictures = await CRUDPicture.get_pictures(session)
     if not pictures:
         await callback.message.delete()
@@ -126,7 +130,7 @@ async def edit_pictures_menu(
     else:
         await callback.message.delete()
         await callback.message.answer(
-            text='Картины',
+            text='Текущие картины в рассылке',
             reply_markup=list_of_current_pictures_kb(pictures),
         )
         await state.set_state(FSMAdminPicture.open_picture)
@@ -152,29 +156,6 @@ async def cancel_delete_picture(callback: CallbackQuery):
     await callback.message.edit_reply_markup(
         reply_markup=open_picture_kb(),
     )
-
-
-@router.callback_query(F.data == 'confirm delete picture')
-async def confirm_delete_picture(
-    callback: CallbackQuery, state: FSMContext, session: AsyncSession
-):
-    data = await state.get_data()
-    await CRUDPicture.delete_picture(session, id=int(data['picture_id']))
-    pictures = await CRUDPicture.get_pictures(session)
-    if not pictures:
-        await callback.message.delete()
-        await callback.message.answer(
-            text='Тут пусто, сперва загрузки картины',
-            reply_markup=back_pictures_menu(),
-        )
-        await state.clear()
-    else:
-        await callback.message.delete()
-        await callback.message.answer(
-            text='Картины',
-            reply_markup=list_of_current_pictures_kb(pictures),
-        )
-        await state.set_state(FSMAdminPicture.open_picture)
 
 
 @router.callback_query(F.data == 'change picture title')
