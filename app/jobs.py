@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import random
 
 from aiogram import Bot
@@ -7,6 +8,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.database.crud import CRUDPicture, CRUDUser
 from app.database.models import Picture
+
+logger = logging.getLogger(__name__)
 
 
 async def send_random_picture(session_maker: async_sessionmaker, bot: Bot) -> None:
@@ -25,6 +28,7 @@ async def send_random_picture(session_maker: async_sessionmaker, bot: Bot) -> No
 
     picture: Picture = random.choice(media)
     for user_id in user_ids:
+        logger.info('[SCHEDULER] Рассылка начата.')
         try:
             await bot.send_photo(
                 chat_id=user_id, photo=picture.picture_id, caption=picture.description
@@ -32,3 +36,4 @@ async def send_random_picture(session_maker: async_sessionmaker, bot: Bot) -> No
             await asyncio.sleep(0.05)
         except TelegramForbiddenError:
             continue
+    logger.info('[SCHEDULER] Рассылка завершена.')
