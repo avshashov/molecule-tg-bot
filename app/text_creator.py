@@ -38,9 +38,7 @@ class TextCreator:
             full_name, username = await TextCreator._get_username_and_full_name(
                 session, user_id
             )
-            text += (
-                f'Заказ картины\n\n' f'Имя: {full_name}\n' f'\nКонтакт: @{username}\n'
-            )
+            text += f'Заказ картины\n\n' f'Имя: {full_name}\nКонтакт: @{username}\n'
             if 'enter_telephone' in kwargs:
                 text += (
                     f'Телефон: {kwargs.get("enter_telephone", "-")}\n'
