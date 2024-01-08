@@ -11,3 +11,9 @@ db:
   password: # пароль БД (str)
   database: # название БД (str)
   echo_db: # режим отладки (bool)
+
+scheduler:
+  trigger: # тип триггера (str)
+  day: # день триггера (str)
+  hour: # час триггера (int)
+  minute: # минута триггера (int)

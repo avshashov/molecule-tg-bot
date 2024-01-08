@@ -19,9 +19,17 @@ class DatabaseConfig(BaseModel):
     echo_db: bool
 
 
+class SchedulerConfig(BaseModel):
+    trigger: str
+    day: str
+    hour: int
+    minute: int
+
+
 class Config(YamlBaseSettings):
     tg_bot: TgBot
     db: DatabaseConfig
+    scheduler: SchedulerConfig
 
     model_config = SettingsConfigDict(yaml_file='config.yaml')
 
