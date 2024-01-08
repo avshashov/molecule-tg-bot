@@ -51,16 +51,6 @@ async def add_presentation_menu(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSMAdminAboutProject.upload_presentation)
 
 
-@router.callback_query(F.data == 'back admin panel from project')
-async def back_to_admin_panel(callback: CallbackQuery):
-    await callback.message.delete()
-    await callback.message.answer(
-        text=f'Панель администратора.'
-        f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
-        reply_markup=admin_panel_kb(),
-    )
-
-
 @router.message(F.document, StateFilter(FSMAdminAboutProject.upload_presentation))
 async def get_presentation(message: Message, state: FSMContext, session: AsyncSession):
     file_id = message.document.file_id

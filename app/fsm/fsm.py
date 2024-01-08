@@ -11,7 +11,6 @@ class FSM_RENT(StatesGroup):  # Состояние пользователя:
     date = State()  # Ввод даты
     event = State()  # Какое мероприятие
     how_people = State()  # Сколько человек
-    how_room = State()  # Сколько залов (1 или 2)
     send_rent = State()  # Состояние готовности к отправке сообщения админам
 
 
@@ -54,3 +53,7 @@ class FSMAdminPicture(StatesGroup):
     enter_new_picture_title = State()
     enter_new_picture_description = State()
     open_picture = State()
+
+
+class FSMAdminContacts(StatesGroup):
+    enter_contacts = State()

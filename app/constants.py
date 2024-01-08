@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class PictureStatus(Enum):
+class PictureStatus(str, Enum):
     READY = 'ready'
     ORDER = 'order'
     RENT = 'rent_order'
@@ -20,3 +20,4 @@ class MediaType(int, Enum):
 
 class BlockText(str, Enum):
     RENT = 'Аренда'
+    CONTACTS = 'Контакты'

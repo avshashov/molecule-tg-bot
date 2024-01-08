@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.constants import MediaBlock, MediaType, BlockText
 from app.database.crud import CRUDMedia, CRUDBlockText
 from app.fsm.fsm import FSMAdminRent
-from app.keyboards.admin.common_kb import admin_panel_kb
 from app.keyboards.admin.rent_kb import (
     cancel_send_rent_photo_kb,
     confirm_delete_rent_photo_kb,
@@ -28,15 +27,6 @@ router = Router()
 async def admin_rent_menu(callback: CallbackQuery):
     await callback.message.edit_text(
         text='Настройка блока аренды', reply_markup=rent_menu_kb()
-    )
-
-
-@router.callback_query(F.data == 'back admin panel')
-async def back_to_admin_panel(callback: CallbackQuery):
-    await callback.message.edit_text(
-        text=f'Панель администратора.'
-        f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
-        reply_markup=admin_panel_kb(),
     )
 
 

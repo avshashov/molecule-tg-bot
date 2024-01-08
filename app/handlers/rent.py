@@ -1,17 +1,19 @@
 from aiogram import Bot, F, Router
+from aiogram.enums import ParseMode
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
+from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove, InputMediaPhoto
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database.crud import CRUDBlockText, CRUDMedia
+from app.keyboards.menu_kb import menu_kb
 from config import config
-from app.constants import PictureStatus
-from app.database.database import photo_room, users_db
+from app.constants import PictureStatus, BlockText, MediaType, MediaBlock
 from app.fsm.fsm import FSM_RENT
 from app.keyboards.rent_kb import (
     cancel_rent,
     communication_method,
-    how_room,
     rent,
     rental_request,
     send,
@@ -23,18 +25,18 @@ from app.text_creator import TextCreator
 router = Router()
 
 
-# Хендлер чтобы поймать ID фоток
-# @router.message(F.photo)
-# async def photo(message: Message):
-#    print(message.photo[2].file_id)
-
-
 # Хендлер на кнопку меню 'Аренда'
 @router.message(F.text == LEXICON_MENU_BUTTONS['rent'])
-async def rent_button(message: Message):
-    await message.answer(text=LEXICON_RENT['rent'])
-    if photo_room:
-        await message.answer_media_group(media=photo_room)
+async def rent_button(message: Message, session: AsyncSession):
+    rent_text = await CRUDBlockText.get_text_by_block(session, block=BlockText.RENT)
+    if rent_text:
+        await message.answer(text=rent_text, parse_mode=ParseMode.MARKDOWN_V2)
+    media = await CRUDMedia.get_media(
+        session, media_type_id=MediaType.PHOTO, media_block_id=MediaBlock.RENT
+    )
+    if media:
+        media = [InputMediaPhoto(media=photo.media_id) for photo in media]
+        await message.answer_media_group(media=media)
     await message.answer(text='Оставляй заявку прямо здесь 👇', reply_markup=rent())
 
 
@@ -124,53 +126,27 @@ async def event_sent(message: Message, state: FSMContext):
 
 
 # Хендлер на введенное количество человек,
-# переводит в состояние ожидания выбора количества залов
+# переводит в состояние завершения формирования заявки
 @router.message(StateFilter(FSM_RENT.how_people))
-async def how_people_sent(message: Message, state: FSMContext):
+async def how_people_sent(message: Message, state: FSMContext, session: AsyncSession):
     text = message.text
     if text.isdigit():
         await state.update_data(how_people=message.text)
-        await message.answer(text=LEXICON_RENT['how_room'], reply_markup=how_room())
-        await state.set_state(FSM_RENT.how_room)
+        data = await state.get_data()
+        text = await TextCreator.create_text_rent(
+            session, user_id=message.from_user.id, mode=PictureStatus.RENT, **data
+        )
+        await message.answer(
+            text=f'{LEXICON_RENT["finish"]}\n\n' f'{text}',
+            reply_markup=send(),
+        )
+        await state.set_state(FSM_RENT.send_rent)
+        await state.update_data(text=text)
     else:
         await message.answer(
             text=f'{LEXICON_RENT["not_people"]}\n\n' f'{LEXICON_RENT["breaking"]}',
             reply_markup=cancel_rent(),
         )
-
-
-# Хендлер на кнопки выбора количества залов,
-# завершает формирование заявки
-@router.callback_query(StateFilter(FSM_RENT.how_room), F.data.in_(['one', 'two']))
-async def how_room_press(callback: CallbackQuery, state: FSMContext):
-    await state.update_data(how_room=LEXICON_RENT[callback.data])
-    await callback.message.delete()  # Удалить сообщение с кнопками
-
-    id = callback.from_user.id
-    data = await state.get_data()
-    await state.clear()
-
-    # Формирование сообщения заявки
-    text = TextCreator.create_text_rent(users_db, id, mode=PictureStatus.RENT, **data)
-
-    await callback.message.answer(
-        text=f'Ты выбрал - {LEXICON_RENT[callback.data]}\n\n'
-        f'{LEXICON_RENT["finish"]}\n\n'
-        f'{text}',
-        reply_markup=send(),
-    )
-    await state.set_state(FSM_RENT.send_rent)
-    await state.update_data(text=text)
-
-
-# Хендлер будет срабатывать, если во время выбора количества залов
-# будет отправлено что-то некорректное
-@router.message(StateFilter(FSM_RENT.how_room))
-async def warning_not_room(message: Message):
-    await message.answer(
-        text=f'{LEXICON_RENT["not_room"]}\n\n' f'{LEXICON_RENT["breaking"]}',
-        reply_markup=cancel_rent(),
-    )
 
 
 # Хендлер на кнопку 'Отправить'
@@ -180,7 +156,7 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     data = await state.get_data()
     await callback.message.answer(text=LEXICON_RENT['sending'])
     # Отправка пользователю данных заявки
-    await callback.message.answer(text=f'{data["text"]}')
+    await callback.message.answer(text=f'{data["text"]}', reply_markup=menu_kb())
     # Отправка заявки в чат с админами
-    await bot.send_message(chat_id=config.tg_bot.admin_id, text=f'{data["text"]}')
+    await bot.send_message(chat_id=config.tg_bot.admin_group_id, text=f'{data["text"]}')
     await state.clear()

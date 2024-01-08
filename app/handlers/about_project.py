@@ -1,7 +1,9 @@
-from aiogram import Bot, F, Router
+from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.database import preza
+from app.constants import MediaBlock, MediaType
+from app.database.crud import CRUDMedia
 from app.keyboards.about_project_kb import about_project
 from app.lexicon.lexicon_ru import LEXICON_ABOUT_PROJECT, LEXICON_MENU_BUTTONS
 
@@ -16,22 +18,22 @@ async def projects_button(message: Message):
     )
 
 
-# Хендлер чтобы поймать ID файла презентации
-# @router.message(F.document)
-# async def document(message: Message):
-#    print(message.model_dump_json())
-#    presentation_id['file_name'] = message.document.file_name
-#    presentation_id['file_id'] = message.document.file_id
-#    presentation_id['file_unique_id'] = message.document.file_unique_id
-#    print(presentation_id)
-
-
 # Хендлер на кнопку 'Скачать PDF презентацию'
 @router.callback_query(F.data == 'download_presentation')
-async def download_presentation(callback: CallbackQuery, bot: Bot):
-    if 'file_id' in preza:
-        await bot.send_document(
-            chat_id=callback.from_user.id, document=preza['file_id']
+async def download_presentation(callback: CallbackQuery, session: AsyncSession):
+    media = await CRUDMedia.get_media(
+        session,
+        media_type_id=MediaType.PRESENTATION,
+        media_block_id=MediaBlock.ABOUT_PROJECT,
+    )
+    await callback.message.delete()
+    if media:
+        presentation = media[-1]
+        await callback.message.answer_document(
+            document=presentation.media_id,
+            reply_markup=about_project(),
         )
     else:
-        await callback.message.answer(text='Извини, презентация пока не готова')
+        await callback.message.answer(
+            text='Извини, презентация пока не готова', reply_markup=about_project()
+        )

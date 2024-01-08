@@ -3,10 +3,10 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import config
 from app.constants import PictureStatus
-from app.database.database import users_db
 from app.fsm.fsm import FSM_PICTURE
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.pictures_kb import (
@@ -44,22 +44,31 @@ async def buy_button(callback: CallbackQuery):
 async def contact_button(callback: CallbackQuery, state: FSMContext):
     if callback.data == 'contact_me':
         await callback.message.edit_text(
-            text=LEXICON_PICTURES['how_contact_buy'], reply_markup=method_contact()
+            text=LEXICON_PICTURES['how_contact_buy'],
+            reply_markup=method_contact(picture_is_ready=True),
         )
         await state.set_state(FSM_PICTURE.how_contact_buy_ready)
     elif callback.data == 'order_painting':
         await callback.message.edit_text(
-            text=LEXICON_PICTURES['how_contact_order'], reply_markup=method_contact()
+            text=LEXICON_PICTURES['how_contact_order'],
+            reply_markup=method_contact(picture_is_ready=False),
         )
         await state.set_state(FSM_PICTURE.how_contact_order)
 
 
 # Хендлер на кнопку "Отменить" - выводит в меню картины
-@router.callback_query(F.data == 'cancel_button_pictures', ~StateFilter(default_state))
+@router.callback_query(
+    F.data.startswith('cancel_button_pictures'), ~StateFilter(default_state)
+)
 async def cancel_button(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(
-        text=LEXICON_PICTURES['cancel_process'], reply_markup=pictures()
-    )
+    if callback.data.endswith('True'):
+        await callback.message.edit_text(
+            text=LEXICON_PICTURES['cancel_process'], reply_markup=buy_ready()
+        )
+    else:
+        await callback.message.edit_text(
+            text=LEXICON_PICTURES['pictures'], reply_markup=pictures()
+        )
     await state.clear()
 
 
@@ -93,10 +102,15 @@ async def how_contact(callback: CallbackQuery, state: FSMContext):
 @router.message(
     StateFilter(FSM_PICTURE.how_contact_buy_ready, FSM_PICTURE.how_contact_order)
 )
-async def warning_not_contact(message: Message):
+async def warning_not_contact(message: Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state == FSM_PICTURE.how_contact_buy_ready:
+        keyboard = method_contact(picture_is_ready=True)
+    else:
+        keyboard = method_contact(picture_is_ready=False)
     await message.answer(
         text=f'{LEXICON_RENT["not_contact"]}\n\n' f'{LEXICON_PICTURES["breaking"]}',
-        reply_markup=method_contact(),
+        reply_markup=keyboard,
     )
 
 
@@ -118,12 +132,12 @@ async def email_button(callback: CallbackQuery, state: FSMContext):
 @router.message(
     StateFilter(FSM_PICTURE.enter_email_buy_ready, FSM_PICTURE.enter_email_order)
 )
-async def email_process(message: Message, state: FSMContext):
+async def email_process(message: Message, state: FSMContext, session: AsyncSession):
     if FSM_PICTURE.enter_email_buy_ready == await state.get_state():
         await state.update_data(enter_email=message.text)
         id = message.from_user.id
         data = await state.get_data()
-        text = TextCreator.create_text_ready(users_db, id, mode='ready', **data)
+        text = await TextCreator.create_text_ready(session, id, mode='ready', **data)
         await message.answer(
             text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
             reply_markup=send_correct(),
@@ -149,7 +163,7 @@ async def email_process(message: Message, state: FSMContext):
     ),
     F.contact,
 )
-async def contact_sent(message: Message, state: FSMContext):
+async def contact_sent(message: Message, state: FSMContext, session: AsyncSession):
     if (message.text and message.text.isdigit()) or message.contact:
         await message.answer(
             text='👍', reply_markup=ReplyKeyboardRemove()
@@ -162,8 +176,8 @@ async def contact_sent(message: Message, state: FSMContext):
             # формирование сообшения - отправка данных админам
             id = message.from_user.id
             data = await state.get_data()
-            text = TextCreator.create_text_ready(
-                users_db, id, mode=PictureStatus.READY, **data
+            text = await TextCreator.create_text_ready(
+                session, id, mode=PictureStatus.READY, **data
             )
             await message.answer(
                 text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"',
@@ -229,7 +243,7 @@ async def mood(message: Message, state: FSMContext):
 # Хендлер на вопрос 'Цветовая гамма' - проверка всех введенных данных пользователем
 @router.message(StateFilter(FSM_PICTURE.color))
 @router.message(StateFilter(FSM_PICTURE.color), F.text == LEXICON_PICTURES['skip'])
-async def color(message: Message, state: FSMContext):
+async def color(message: Message, state: FSMContext, session: AsyncSession):
     await message.answer(
         text='Благодарю за ответы ☑️', reply_markup=ReplyKeyboardRemove()
     )
@@ -237,7 +251,9 @@ async def color(message: Message, state: FSMContext):
         await state.update_data(color=message.text)
     id = message.from_user.id
     data = await state.get_data()
-    text = TextCreator.create_text_order(users_db, id, mode=PictureStatus.ORDER, **data)
+    text = await TextCreator.create_text_order(
+        session, id, mode=PictureStatus.ORDER, **data
+    )
     await message.answer(
         text=f'Проверь данные -\n\n{text}\n\nЕсли верно - жми "Отправить", если нет - "Исправить"(Ответить заново)',
         reply_markup=send_correct(),
@@ -259,7 +275,7 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     # Отправка пользователю данных заявки
     await callback.message.answer(text=f'{data["text"]}', reply_markup=menu_kb())
     # Отправка заявки в чат с админами
-    await bot.send_message(chat_id=config.tg_bot.admin_id, text=f'{data["text"]}')
+    await bot.send_message(chat_id=config.tg_bot.admin_group_id, text=f'{data["text"]}')
     await state.clear()
 
 
@@ -270,13 +286,15 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
 async def correct_button(callback: CallbackQuery, state: FSMContext):
     if FSM_PICTURE.send_buy_ready == await state.get_state():
         await callback.message.edit_text(
-            text=LEXICON_PICTURES['how_contact_buy'], reply_markup=method_contact()
+            text=LEXICON_PICTURES['how_contact_buy'],
+            reply_markup=method_contact(picture_is_ready=True),
         )
         await state.clear()
         await state.set_state(FSM_PICTURE.how_contact_buy_ready)
     elif FSM_PICTURE.send_order == await state.get_state():
         await callback.message.edit_text(
-            text=LEXICON_PICTURES['how_contact_order'], reply_markup=method_contact()
+            text=LEXICON_PICTURES['how_contact_order'],
+            reply_markup=method_contact(picture_is_ready=False),
         )
         await state.clear()
         await state.set_state(FSM_PICTURE.how_contact_order)

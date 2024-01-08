@@ -6,10 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.crud import CRUDPicture
 from app.fsm.fsm import FSMAdminPicture
-from app.keyboards.admin.common_kb import admin_panel_kb
+from app.keyboards.admin.common_kb import cancel_kb
 from app.keyboards.admin.scheduler_kb import (
     back_pictures_menu,
-    cancel_kb,
     confirm_delete_picture_kb,
     list_of_current_pictures_kb,
     open_picture_kb,
@@ -25,16 +24,6 @@ async def admin_pictures_menu(callback: CallbackQuery):
     await callback.message.edit_text(
         text='Меню настройки картин для рассылки пользователям',
         reply_markup=picture_menu_kb(),
-    )
-
-
-@router.callback_query(F.data == 'back admin panel from pictures')
-async def back_to_admin_panel(callback: CallbackQuery):
-    await callback.message.delete()
-    await callback.message.answer(
-        text=f'Панель администратора.'
-        f'\n\nДля изменения наполнения конкретного раздела выбери кнопку ниже:',
-        reply_markup=admin_panel_kb(),
     )
 
 
