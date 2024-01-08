@@ -59,7 +59,7 @@ def buy_ready() -> InlineKeyboardMarkup:
 
 
 # Клавиатура выбора способа связи
-def method_contact() -> InlineKeyboardMarkup:
+def method_contact(picture_is_ready: bool) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text=LEXICON_RENT['call'], callback_data='call'))
     kb.add(
@@ -72,7 +72,7 @@ def method_contact() -> InlineKeyboardMarkup:
     kb.add(
         InlineKeyboardButton(
             text=LEXICON_PICTURES['cancel_button'],
-            callback_data='cancel_button_pictures',
+            callback_data=f'cancel_button_pictures {picture_is_ready}',
         )
     )
     kb.adjust(1)
