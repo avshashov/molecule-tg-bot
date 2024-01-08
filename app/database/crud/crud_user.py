@@ -34,7 +34,7 @@ class CRUDUser:
         return stmt.scalar()
 
     @staticmethod
-    async def get_tg_user_ids(session: AsyncSession) -> list[User]:
+    async def get_tg_user_ids(session: AsyncSession) -> list[int]:
         """
         Метод получения телеграм ID пользователей.
 
@@ -58,7 +58,7 @@ class CRUDUser:
         return bool(stmt)
     
     @staticmethod
-    async def get_user_full_name(session: AsyncSession, tg_user_id: int) -> User | None:
+    async def get_user_full_name(session: AsyncSession, tg_user_id: int) -> str | None:
         """
         Метод получения имени пользователя.
 
