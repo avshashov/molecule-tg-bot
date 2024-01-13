@@ -26,9 +26,10 @@ def pictures() -> InlineKeyboardMarkup:
             InlineKeyboardButton(
                 text=LEXICON_MENU_BUTTONS['main_menu'], callback_data='main_menu'
             ),
-            InlineKeyboardButton(
-                text=LEXICON_PICTURES['online_gallery'], callback_data='online_gallery'
-            ),
+            # TODO: включить как будет готов сайт
+            # InlineKeyboardButton(
+            #     text=LEXICON_PICTURES['online_gallery'], callback_data='online_gallery'
+            # ),
         ],
         width=1
     )

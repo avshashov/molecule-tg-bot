@@ -7,8 +7,9 @@ from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS
 # Клавиатура главного меню
 def menu_kb() -> ReplyKeyboardMarkup:
     menu_builder = ReplyKeyboardBuilder()
-    menu_builder.button(text=LEXICON_MENU_BUTTONS['announcements'])
-    menu_builder.button(text=LEXICON_MENU_BUTTONS['projects'])
+    # TODO: включить как будет готов сайт
+    # menu_builder.button(text=LEXICON_MENU_BUTTONS['announcements'])
+    # menu_builder.button(text=LEXICON_MENU_BUTTONS['projects'])
     menu_builder.button(text=LEXICON_MENU_BUTTONS['rent'])
     menu_builder.button(text=LEXICON_MENU_BUTTONS['pictures'])
     menu_builder.button(text=LEXICON_MENU_BUTTONS['project'])
