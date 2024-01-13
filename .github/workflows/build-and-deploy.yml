@@ -58,13 +58,15 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
           message: |
-            ${{ github.actor }} created commit:
-             Commit message: ${{ github.event.commits[0].message }}
+            **GitHub Action**: build-and-deploy
+            **Pipeline**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            **Jobs status**: ${{ needs.build.status }}
+            **Repository**: ${{ github.repository }}
+            **Target branch**: ${{ github.ref_name }}
+            **Event name**: ${{ github.event_name }}
+            **Commit author**:  ${{ github.actor }}
 
-             github.event: ${{ github.event }}
-             github.event_name: ${{ github.event_name }}
-             github.ref: ${{ github.ref }}
-             github.ref_name: ${{ github.ref_name }}
-             github.run_id: ${{ github.run_id }}
-             Repository: ${{ github.repository }}
+            **Commit message**: ${{ github.event.commits[0].message }}
+
