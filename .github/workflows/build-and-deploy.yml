@@ -2,12 +2,10 @@ name: build-and-deploy
 on:
   push:
     branches:
-      #  - main
-      - 'feature/cicd'
+      - main
   pull_request:
     branches:
-      #  - main
-      - 'feature/cicd'
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,26 +29,25 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_REPOSITORY }}/${{ secrets.DOCKERHUB_IMAGE }}:latest
 
-  #  deploy:
-  #    needs: [ build ]
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - name: Run deploy on server
-  #        uses: appleboy/ssh-action@v1.0.3
-  #        with:
-  #          host: ${{ secrets.HOST }}
-  #          username: ${{ secrets.USERNAME }}
-  #          key: ${{ secrets.KEY }}
-  #          port: ${{ secrets.PORT }}
-  #          script: |
-  #            cd ${{ DOCKER_COMPOSE_FILE_DIR }}
-  #            docker compose down
-  #            docker compose pull
-  #            docker compose up -d
+  deploy:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ${{ DOCKER_COMPOSE_FILE_DIR }}
+            docker compose down
+            docker compose pull
+            docker compose up -d
 
   notify:
-    needs: [ build ]
-    #    needs: [ deploy ]
+    needs: [ deploy ]
     runs-on: ubuntu-latest
     steps:
       - name: Send telegram message on finished deploy

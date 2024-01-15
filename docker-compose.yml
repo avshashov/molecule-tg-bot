@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  bot:
+    image: temandriys/molecule_bot:latest
+    container_name: molecule_bot
+    restart: always
+    environment:
+      TZ: "Asia/Vladivostok"
+    volumes:
+      - "./config.yaml:/app/molecule-tg-bot/config.yaml"
+    network_mode: host
