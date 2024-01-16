@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.constants import BlockText
 from app.database.crud import CRUDBlockText, CRUDUser
-from app.fsm.fsm import FSM_SET_NAME
+from app.fsm.fsm import FSMSetName
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_kb
 from app.lexicon.lexicon_ru import LEXICON_MENU_BUTTONS, LEXICON_SET_USER_NAME
@@ -40,7 +40,7 @@ async def start_command(message: Message, state: FSMContext, session: AsyncSessi
     else:  # Если пользователя нет в базе и не указан фулл нейм
         await message.answer(text=LEXICON_SET_USER_NAME['unknown'])
         # устанавливаем машину состояний: ожидание ввода имени, пользователь указывает имя, заносим в базу
-        await state.set_state(FSM_SET_NAME.enter_name)
+        await state.set_state(FSMSetName.enter_name)
 
 
 # Хендлер на команду "/contacts"

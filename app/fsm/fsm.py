@@ -1,36 +1,33 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class FSM_SET_NAME(StatesGroup):
-    enter_name = State()  # Состояние ожидания ввода имени
+class FSMSetName(StatesGroup):
+    enter_name = State()
 
 
-class FSM_RENT(StatesGroup):  # Состояние пользователя:
-    enter_telephone = State()  # Ввод телефона
-    how_contact = State()  # Как связаться
-    date = State()  # Ввод даты
-    event = State()  # Какое мероприятие
-    how_people = State()  # Сколько человек
+class FSMRent(StatesGroup):
+    enter_telephone = State()
+    how_contact = State()
+    date = State()
+    event = State()
+    how_people = State()
     send_rent = State()  # Состояние готовности к отправке сообщения админам
 
 
-class FSM_PICTURE(StatesGroup):
+class FSMPicture(StatesGroup):
     how_contact_buy_ready = State()
     enter_telephone_buy_ready = State()
     enter_email_buy_ready = State()
-
     send_buy_ready = State()
     send_order = State()
-
     enter_telephone_order = State()
     enter_email_order = State()
     how_contact_order = State()
-
-    for_whom = State()  # Для кого картина
-    event = State()  # По какому случаю
-    size = State()  # Какого размера
-    mood = State()  # Какое настроение
-    color = State()  # Цветовая гамма
+    for_whom = State()
+    event = State()
+    size = State()
+    mood = State()
+    color = State()
 
 
 class FSMAdminRent(StatesGroup):

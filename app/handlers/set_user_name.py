@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.fsm.fsm import FSM_SET_NAME
+from app.fsm.fsm import FSMSetName
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.user_name_setting import yes_no_name_kb
 from app.lexicon.lexicon_ru import LEXICON_SET_USER_NAME
@@ -31,14 +31,14 @@ async def of_course_answer(callback: CallbackQuery, session: AsyncSession):
 # Хендлер на кнопку "Изменить имя" устанавливает машину состояний: ожидание ввода имени +
 # Хендлер на кнопку "НЕТ" - даем пользователю возможность ввести имя еще раз
 @router.callback_query(F.data == 'another name')
-@router.callback_query(F.data == 'not', StateFilter(FSM_SET_NAME.enter_name))
+@router.callback_query(F.data == 'not', StateFilter(FSMSetName.enter_name))
 async def replace_name(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(text=LEXICON_SET_USER_NAME['what_is_your_name'])
-    await state.set_state(FSM_SET_NAME.enter_name)
+    await state.set_state(FSMSetName.enter_name)
 
 
 # Хендлер на введенное имя, записывает введенное имя в хранилище, спрашивает: оставить имя или нет?
-@router.message(StateFilter(FSM_SET_NAME.enter_name))
+@router.message(StateFilter(FSMSetName.enter_name))
 async def name_sent(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
     await message.answer(
@@ -47,7 +47,7 @@ async def name_sent(message: Message, state: FSMContext):
 
 
 # Хендлер на кнопку ДА (подтверддение имени) - заносит имя в базу, приветствует, предлагает меню
-@router.callback_query(F.data == 'confirm', StateFilter(FSM_SET_NAME.enter_name))
+@router.callback_query(F.data == 'confirm', StateFilter(FSMSetName.enter_name))
 async def confirm(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     # заносим имя в базу из хранилища
     full_name = (await state.get_data()).get('name')

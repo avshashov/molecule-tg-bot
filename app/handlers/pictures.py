@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import config
 from app.constants import PictureStatus
-from app.fsm.fsm import FSM_PICTURE
+from app.fsm.fsm import FSMPicture
 from app.keyboards.menu_kb import menu_kb
 from app.keyboards.pictures_kb import (
     buy_ready,
@@ -39,21 +39,20 @@ async def buy_button(callback: CallbackQuery):
 
 
 # Хендлер на кнопку 'Свяжитесь со мной' и 'Заказать картину'
-@router.callback_query(F.data == 'contact_me')
-@router.callback_query(F.data == 'order_painting')
+@router.callback_query(F.data.in_(['contact_me', 'order_painting']))
 async def contact_button(callback: CallbackQuery, state: FSMContext):
     if callback.data == 'contact_me':
         await callback.message.edit_text(
             text=LEXICON_PICTURES['how_contact_buy'],
             reply_markup=method_contact(picture_is_ready=True),
         )
-        await state.set_state(FSM_PICTURE.how_contact_buy_ready)
+        await state.set_state(FSMPicture.how_contact_buy_ready)
     elif callback.data == 'order_painting':
         await callback.message.edit_text(
             text=LEXICON_PICTURES['how_contact_order'],
             reply_markup=method_contact(picture_is_ready=False),
         )
-        await state.set_state(FSM_PICTURE.how_contact_order)
+        await state.set_state(FSMPicture.how_contact_order)
 
 
 # Хендлер на кнопку "Отменить" - выводит в меню картины
@@ -82,7 +81,7 @@ async def back_button(callback: CallbackQuery):
 
 # Хендлер на кнопки 'Звонок', 'whatsapp', 'telegram'
 @router.callback_query(
-    StateFilter(FSM_PICTURE.how_contact_buy_ready, FSM_PICTURE.how_contact_order),
+    StateFilter(FSMPicture.how_contact_buy_ready, FSMPicture.how_contact_order),
     F.data.in_(['call', 'telegram', 'whatsapp']),
 )
 async def how_contact(callback: CallbackQuery, state: FSMContext):
@@ -91,20 +90,20 @@ async def how_contact(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text=LEXICON_PICTURES['number'], reply_markup=send_contact()
     )
-    if FSM_PICTURE.how_contact_buy_ready == await state.get_state():
-        await state.set_state(FSM_PICTURE.enter_telephone_buy_ready)
-    elif FSM_PICTURE.how_contact_order == await state.get_state():
-        await state.set_state(FSM_PICTURE.enter_telephone_order)
+    if FSMPicture.how_contact_buy_ready == await state.get_state():
+        await state.set_state(FSMPicture.enter_telephone_buy_ready)
+    elif FSMPicture.how_contact_order == await state.get_state():
+        await state.set_state(FSMPicture.enter_telephone_order)
 
 
 # Хендлер будет срабатывать, если во время выбора способа связи
 # будет отправлено что-то некорректное
 @router.message(
-    StateFilter(FSM_PICTURE.how_contact_buy_ready, FSM_PICTURE.how_contact_order)
+    StateFilter(FSMPicture.how_contact_buy_ready, FSMPicture.how_contact_order)
 )
 async def warning_not_contact(message: Message, state: FSMContext):
     current_state = await state.get_state()
-    if current_state == FSM_PICTURE.how_contact_buy_ready:
+    if current_state == FSMPicture.how_contact_buy_ready:
         keyboard = method_contact(picture_is_ready=True)
     else:
         keyboard = method_contact(picture_is_ready=False)
@@ -116,24 +115,24 @@ async def warning_not_contact(message: Message, state: FSMContext):
 
 # Хендлер на кнопку 'email'
 @router.callback_query(
-    StateFilter(FSM_PICTURE.how_contact_buy_ready, FSM_PICTURE.how_contact_order),
+    StateFilter(FSMPicture.how_contact_buy_ready, FSMPicture.how_contact_order),
     F.data == 'email',
 )
 async def email_button(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(text=LEXICON_PICTURES['enter_email'])
-    if FSM_PICTURE.how_contact_buy_ready == await state.get_state():
-        await state.set_state(FSM_PICTURE.enter_email_buy_ready)
-    elif FSM_PICTURE.how_contact_order == await state.get_state():
-        await state.set_state(FSM_PICTURE.enter_email_order)
+    if FSMPicture.how_contact_buy_ready == await state.get_state():
+        await state.set_state(FSMPicture.enter_email_buy_ready)
+    elif FSMPicture.how_contact_order == await state.get_state():
+        await state.set_state(FSMPicture.enter_email_order)
 
 
 # Хендлер на введенный email - отправка данных админам
 @router.message(
-    StateFilter(FSM_PICTURE.enter_email_buy_ready, FSM_PICTURE.enter_email_order)
+    StateFilter(FSMPicture.enter_email_buy_ready, FSMPicture.enter_email_order)
 )
 async def email_process(message: Message, state: FSMContext, session: AsyncSession):
-    if FSM_PICTURE.enter_email_buy_ready == await state.get_state():
+    if FSMPicture.enter_email_buy_ready == await state.get_state():
         await state.update_data(enter_email=message.text)
         id = message.from_user.id
         data = await state.get_data()
@@ -143,25 +142,19 @@ async def email_process(message: Message, state: FSMContext, session: AsyncSessi
             reply_markup=send_correct(),
         )
         await state.clear()
-        await state.set_state(FSM_PICTURE.send_buy_ready)
+        await state.set_state(FSMPicture.send_buy_ready)
         await state.update_data(text=text)
-    elif FSM_PICTURE.enter_email_order == await state.get_state():
+    elif FSMPicture.enter_email_order == await state.get_state():
         await state.update_data(enter_email=message.text)
         await message.answer(text=LEXICON_PICTURES['addressee'], reply_markup=skip())
-        await state.set_state(FSM_PICTURE.for_whom)
+        await state.set_state(FSMPicture.for_whom)
 
 
 # Хендлер на введенный номер телефона или на присланный контакт
 @router.message(
     StateFilter(
-        FSM_PICTURE.enter_telephone_buy_ready, FSM_PICTURE.enter_telephone_order
+        FSMPicture.enter_telephone_buy_ready, FSMPicture.enter_telephone_order
     )
-)
-@router.message(
-    StateFilter(
-        FSM_PICTURE.enter_telephone_buy_ready, FSM_PICTURE.enter_telephone_order
-    ),
-    F.contact,
 )
 async def contact_sent(message: Message, state: FSMContext, session: AsyncSession):
     if (message.text and message.text.isdigit()) or message.contact:
@@ -172,7 +165,7 @@ async def contact_sent(message: Message, state: FSMContext, session: AsyncSessio
             await state.update_data(enter_telephone=message.text)
         elif message.contact:
             await state.update_data(enter_telephone=message.contact.phone_number)
-        if FSM_PICTURE.enter_telephone_buy_ready == await state.get_state():
+        if FSMPicture.enter_telephone_buy_ready == await state.get_state():
             # формирование сообшения - отправка данных админам
             id = message.from_user.id
             data = await state.get_data()
@@ -184,14 +177,14 @@ async def contact_sent(message: Message, state: FSMContext, session: AsyncSessio
                 reply_markup=send_correct(),
             )
             await state.clear()
-            await state.set_state(FSM_PICTURE.send_buy_ready)
+            await state.set_state(FSMPicture.send_buy_ready)
             await state.update_data(text=text)
 
-        elif FSM_PICTURE.enter_telephone_order == await state.get_state():
+        elif FSMPicture.enter_telephone_order == await state.get_state():
             await message.answer(
                 text=LEXICON_PICTURES['addressee'], reply_markup=skip()
             )
-            await state.set_state(FSM_PICTURE.for_whom)
+            await state.set_state(FSMPicture.for_whom)
     else:
         await message.answer(
             text=f'{LEXICON_RENT["not_telephone"]}\n\n'
@@ -201,48 +194,43 @@ async def contact_sent(message: Message, state: FSMContext, session: AsyncSessio
 
 
 # Хендлер на вопрос 'Для кого картина'
-@router.message(StateFilter(FSM_PICTURE.for_whom))
-@router.message(StateFilter(FSM_PICTURE.for_whom), F.text == LEXICON_PICTURES['skip'])
+@router.message(StateFilter(FSMPicture.for_whom))
 async def for_whom(message: Message, state: FSMContext):
     if message.text != LEXICON_PICTURES['skip']:
         await state.update_data(for_whom=message.text)
     await message.answer(text=LEXICON_PICTURES['event'], reply_markup=skip())
-    await state.set_state(FSM_PICTURE.event)
+    await state.set_state(FSMPicture.event)
 
 
 # Хендлер на вопрос 'По какому случаю'
-@router.message(StateFilter(FSM_PICTURE.event))
-@router.message(StateFilter(FSM_PICTURE.event), F.text == LEXICON_PICTURES['skip'])
+@router.message(StateFilter(FSMPicture.event))
 async def event(message: Message, state: FSMContext):
     if message.text != LEXICON_PICTURES['skip']:
         await state.update_data(event=message.text)
     await message.answer(text=LEXICON_PICTURES['size'], reply_markup=skip())
-    await state.set_state(FSM_PICTURE.size)
+    await state.set_state(FSMPicture.size)
 
 
 # Хендлер на вопрос 'Размер картины'
-@router.message(StateFilter(FSM_PICTURE.size))
-@router.message(StateFilter(FSM_PICTURE.size), F.text == LEXICON_PICTURES['skip'])
+@router.message(StateFilter(FSMPicture.size))
 async def size(message: Message, state: FSMContext):
     if message.text != LEXICON_PICTURES['skip']:
         await state.update_data(size=message.text)
     await message.answer(text=LEXICON_PICTURES['mood'], reply_markup=skip())
-    await state.set_state(FSM_PICTURE.mood)
+    await state.set_state(FSMPicture.mood)
 
 
 # Хендлер на вопрос 'Настроение'
-@router.message(StateFilter(FSM_PICTURE.mood))
-@router.message(StateFilter(FSM_PICTURE.mood), F.text == LEXICON_PICTURES['skip'])
+@router.message(StateFilter(FSMPicture.mood))
 async def mood(message: Message, state: FSMContext):
     if message.text != LEXICON_PICTURES['skip']:
         await state.update_data(mood=message.text)
     await message.answer(text=LEXICON_PICTURES['color'], reply_markup=skip())
-    await state.set_state(FSM_PICTURE.color)
+    await state.set_state(FSMPicture.color)
 
 
 # Хендлер на вопрос 'Цветовая гамма' - проверка всех введенных данных пользователем
-@router.message(StateFilter(FSM_PICTURE.color))
-@router.message(StateFilter(FSM_PICTURE.color), F.text == LEXICON_PICTURES['skip'])
+@router.message(StateFilter(FSMPicture.color))
 async def color(message: Message, state: FSMContext, session: AsyncSession):
     await message.answer(
         text='Благодарю за ответы ☑️', reply_markup=ReplyKeyboardRemove()
@@ -260,13 +248,13 @@ async def color(message: Message, state: FSMContext, session: AsyncSession):
     )
     await state.clear()
     await state.update_data(text=text)
-    await state.set_state(FSM_PICTURE.send_order)
+    await state.set_state(FSMPicture.send_order)
 
 
 # Хендлер на кнопку 'Отправить'
 @router.callback_query(
     F.data == 'send_contact',
-    StateFilter(FSM_PICTURE.send_buy_ready, FSM_PICTURE.send_order),
+    StateFilter(FSMPicture.send_buy_ready, FSMPicture.send_order),
 )
 async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
     await callback.message.delete()
@@ -281,20 +269,20 @@ async def send_press(callback: CallbackQuery, bot: Bot, state: FSMContext):
 
 # Хендлер на нопку 'Исправить' - предлагает ответить на вопросы еще раз
 @router.callback_query(
-    F.data == 'correct', StateFilter(FSM_PICTURE.send_buy_ready, FSM_PICTURE.send_order)
+    F.data == 'correct', StateFilter(FSMPicture.send_buy_ready, FSMPicture.send_order)
 )
 async def correct_button(callback: CallbackQuery, state: FSMContext):
-    if FSM_PICTURE.send_buy_ready == await state.get_state():
+    if FSMPicture.send_buy_ready == await state.get_state():
         await callback.message.edit_text(
             text=LEXICON_PICTURES['how_contact_buy'],
             reply_markup=method_contact(picture_is_ready=True),
         )
         await state.clear()
-        await state.set_state(FSM_PICTURE.how_contact_buy_ready)
-    elif FSM_PICTURE.send_order == await state.get_state():
+        await state.set_state(FSMPicture.how_contact_buy_ready)
+    elif FSMPicture.send_order == await state.get_state():
         await callback.message.edit_text(
             text=LEXICON_PICTURES['how_contact_order'],
             reply_markup=method_contact(picture_is_ready=False),
         )
         await state.clear()
-        await state.set_state(FSM_PICTURE.how_contact_order)
+        await state.set_state(FSMPicture.how_contact_order)

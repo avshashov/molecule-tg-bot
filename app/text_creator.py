@@ -4,7 +4,6 @@ from app.constants import PictureStatus
 from app.database.crud import CRUDUser
 
 
-# формирование сообшений
 class TextCreator:
     @staticmethod
     async def create_text_ready(
